@@ -25,4 +25,9 @@ bg = {
         "white": col.Back.WHITE,
         }
 
+brickCol = [["black", "red", "yellow", "green"],
+            ["purple", "purple", "purple", "purple"],
+            ["white", "white", "white", "white"],
+        ]
+
 delay = 0.5

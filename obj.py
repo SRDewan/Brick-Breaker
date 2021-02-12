@@ -7,16 +7,13 @@ class Object:
 
     def __init__(self, shape, color, pos, vel=[0, 0]):
        self.__shape = shape 
-       self.__color = color
-       self.__pos = pos 
-       self.__vel = vel 
+       self.__color = color  # color[0] => fgcolor, color[1] => bgcolor
+       self.__pos = pos      # pos = [x, y] of top left corner pixel/character of obj
+       self.__vel = vel      # vel = [xvel, yvel]
 
     def draw(self, grid):
-        self.__obj = self.__shape
-        [xlen, ylen] = getShape(self.__obj)
+        [xlen, ylen] = getShape(self.__shape)
 
         for i in range(0, xlen):
             for j in range(0, ylen):
-                self.__obj[i][j] += self.__color 
-
-        grid[self.__pos[0] : self.__pos[0] + xlen, self.__pos[1] : self.__pos[1] + ylen] = self.__obj
+                grid[self.__pos[0] + i][self.__pos[1] + j] = self.__color[1] + self.__shape[i][j]

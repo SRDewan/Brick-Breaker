@@ -16,7 +16,7 @@ class Game:
 
     def __init__(self):
         self.__screen = Screen()
-        self.__brick = Brick(font['white'], [1, 1])
+        self.__brick = Brick(0, [1, 1])
         self.__lives = 3
         
     def play(self):
