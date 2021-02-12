@@ -13,6 +13,7 @@ font = {
         "black": col.Fore.BLACK,
         "purple": col.Fore.MAGENTA,
         "white": col.Fore.WHITE,
+        "reset": col.Fore.RESET,
         }
 
 bg = {
@@ -23,6 +24,7 @@ bg = {
         "black": col.Back.BLACK,
         "purple": col.Back.MAGENTA,
         "white": col.Back.WHITE,
+        "reset": col.Back.RESET,
         }
 
 brickCol = [["black", "red", "yellow", "green"],
