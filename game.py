@@ -33,6 +33,16 @@ class Game:
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__ball = Ball([rows - 3, (int)(cols / 2)])
 
+    def handle_input(self, txt):
+        if(txt == 'a' or txt == 'A'):
+            self.__paddle.keybrd(1, self.__ball)
+
+        elif(txt == 'd' or txt == 'D'):
+            self.__paddle.keybrd(0, self.__ball)
+
+        elif(txt == ' '):
+            self.__paddle.release(self.__ball)
+
     def play(self):
 
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -41,9 +51,11 @@ class Game:
 
             if self.__input.kbhit():
                 inp = self.__input.getch()
+                self.handle_input(inp)
                 
                 self.__input.flush()
 
+            self.__ball.move(1)
             self.__screen.clear()
 
             print("Lives: ", self.__lives)
