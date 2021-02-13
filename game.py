@@ -17,6 +17,7 @@ from input import *
 class Game:
 
     def __init__(self):
+        self.__input = KBHit()
         self.__screen = Screen()
         self.__lives = 3
         self.__score = 0
@@ -38,6 +39,11 @@ class Game:
 
         while True:
 
+            if self.__input.kbhit():
+                inp = self.__input.getch()
+                
+                self.__input.flush()
+
             self.__screen.clear()
 
             print("Lives: ", self.__lives)
@@ -52,7 +58,4 @@ class Game:
 
             self.__screen.disp()
 
-            inp = take_inp()
-            if(inp == 'f'):
-                self.__ball.destroy()
             time.sleep(delay)
