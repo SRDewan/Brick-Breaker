@@ -31,7 +31,7 @@ class Game:
                 self.__bricks[i].append(Brick(0, [2 + 2 * i, 2 + 4 * j]))
         
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
-        self.__ball = Ball([rows - 3, (int)(cols / 2)])
+        self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
 
     def handle_input(self, txt):
         if(txt == 'a' or txt == 'A'):
@@ -44,12 +44,12 @@ class Game:
             self.__paddle.release(self.__ball)
 
     def verticalCol(self, pos1, pos2, dim1, dim2): 
-        if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
-            return True
+        if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
+            return False 
 
-        return False
+        return True 
 
-    def collision(self, obj1, obj2, horizontal=True):
+    def collision(self, obj1, obj2, horizontal=True, thru=False):
         # obj1 always moving obj such as ball
 
         pos1 = np.array(obj1.getPos()[:]) + np.array(obj1.getVel()[:])
@@ -61,17 +61,46 @@ class Game:
         if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
             if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
                 if(self.verticalCol(obj1.getPos(), obj2.getPos(), dim1, dim2)):
-                    obj1.setVel([-1 * obj1.getVel()[0], obj1.getVel()[1]])
+                    return 1 
 
                 elif(horizontal):
-                    obj1.setVel([obj1.getVel()[0], -1 * obj1.getVel()[1]])
+                    return 2 
+
+        return 0 
 
     def handle_collisions(self):
-        self.collision(self.__ball, self.__paddle, False)
+        ret = self.collision(self.__ball, self.__paddle, False)
+
+        if(ret):
+            self.__paddle.collide(self.__ball)
+            self.__ball.collide([-1 * self.__ball.getVel()[0], self.__ball.getVel()[1]])
 
         for i in range(0, len(self.__bricks)):
             for j in range(0, len(self.__bricks[i])):
-                self.collision(self.__ball, self.__bricks[i][j])
+                if(not self.__bricks[i][j].getActive()):
+                    continue
+
+                ret = self.collision(self.__ball, self.__bricks[i][j])
+
+                if(ret):
+                    self.__bricks[i][j].collide()
+                    if(not self.__bricks[i][j].getActive()):
+                        self.__score += points
+
+                    if(ret == 1):
+                        self.__ball.collide([-1 * self.__ball.getVel()[0], self.__ball.getVel()[1]])
+
+                    else:
+                        self.__ball.collide([self.__ball.getVel()[0], -1 * self.__ball.getVel()[1]])
+
+    def lifeLoss(self):
+        self.__lives -= 1
+
+        if(not self.__lives):
+            print(font['red'] + bg['reset'] + "Game Over!")
+            quit()
+
+        self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
 
     def play(self):
 
@@ -87,10 +116,14 @@ class Game:
 
             self.handle_collisions()
             self.__ball.move(1)
+
+            if(not self.__ball.getActive()):
+                self.lifeLoss()
+
             self.__screen.clear()
 
-            print("Lives: ", self.__lives)
-            print("Score: ", self.__score)
+            print(font['white'] + bg['reset'] + "Lives: ", self.__lives)
+            print(font['white'] + bg['reset'] + "Score: ", self.__score)
 
             for i in range(0, 6):
                 for j in range(0, self.__brickCtr):

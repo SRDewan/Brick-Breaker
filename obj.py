@@ -34,6 +34,12 @@ class Object:
     def setVel(self, newVel):
         self.__vel = newVel
 
+    def getColor(self):
+        return self.__color[:]
+
+    def setColor(self, color):
+        self.__color = color  
+
     def chckDown(self):
         # floor check
         if(self.__pos[0] + self.__vel[0] + self.getDim()[0] - 1 >= rows):
@@ -74,6 +80,12 @@ class Object:
 
         elif(flag == 1 and self.chckDown()):
             self.destroy()
+
+    def collide(self, newVel):                                            
+        self.setVel(newVel)
+
+    def getActive(self):
+        return self.__active
 
     def destroy(self):
         self.__active = False

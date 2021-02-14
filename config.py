@@ -32,5 +32,6 @@ brickCol = [["black", "red", "yellow", "green"],
             ["white", "white", "white", "white"],
         ]
 
-delay = 0.5
+delay = 0.2
 jump = 1
+points = 5
