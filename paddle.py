@@ -8,7 +8,7 @@ class Paddle(Object):
 
         shape = listify("     ")
         self.__stick = True  # True => ball sticks to paddle, False => ball reflects
-        super().__init__(shape, [font['black'], bg['white']], pos, True, [0, 2])
+        super().__init__(shape, [font['black'], bg['white']], pos)
 
     def stickChck(self, ball):
         ballPos = ball.getPos()
@@ -26,16 +26,17 @@ class Paddle(Object):
         ballPos = ball.getPos()
 
         oldVel = self.getVel()
-        self.setVel([oldVel[0], pow(-1, dirn) * abs(oldVel[1])])
+        self.setVel([oldVel[0], pow(-1, dirn) * abs(jump)])
 
         self.move()
+        self.setVel([0, 0])
 
         if(oldPos != self.getPos() and self.stickChck(ball)):
         
-            ball.setVel([oldVel[0], pow(-1, dirn) * abs(oldVel[1])])
+            ball.setVel([oldVel[0], pow(-1, dirn) * abs(jump)])
             ball.move()
             ball.setVel([0, 0])
 
     def release(self, ball):
         if(self.stickChck(ball)):
-            ball.setVel([-1, 0])
+            ball.setVel([-1 * jump, 0])

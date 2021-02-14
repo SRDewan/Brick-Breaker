@@ -33,3 +33,4 @@ brickCol = [["black", "red", "yellow", "green"],
         ]
 
 delay = 0.5
+jump = 1

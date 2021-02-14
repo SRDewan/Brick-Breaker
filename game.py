@@ -43,17 +43,35 @@ class Game:
         elif(txt == ' '):
             self.__paddle.release(self.__ball)
 
-    def collision(self, obj1, obj2):
+    def verticalCol(self, pos1, pos2, dim1, dim2): 
+        if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
+            return True
 
-        if(pos1[0] in range(pos2[0], pos2[0] + dim2[0]) and pos1[0] in range(pos2[1], pos2[1] + dim2[1])):
-            pass
+        return False
+
+    def collision(self, obj1, obj2, horizontal=True):
+        # obj1 always moving obj such as ball
+
+        pos1 = np.array(obj1.getPos()[:]) + np.array(obj1.getVel()[:])
+        dim1 = obj1.getDim()[:]
+
+        pos2 = np.array(obj2.getPos()[:]) + np.array(obj2.getVel()[:])
+        dim2 = obj2.getDim()[:]
+
+        if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
+            if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
+                if(self.verticalCol(obj1.getPos(), obj2.getPos(), dim1, dim2)):
+                    obj1.setVel([-1 * obj1.getVel()[0], obj1.getVel()[1]])
+
+                elif(horizontal):
+                    obj1.setVel([obj1.getVel()[0], -1 * obj1.getVel()[1]])
 
     def handle_collisions(self):
-        collision(self.__ball, self.__paddle)
+        self.collision(self.__ball, self.__paddle, False)
 
         for i in range(0, len(self.__bricks)):
             for j in range(0, len(self.__bricks[i])):
-                collision(self.__ball, self.__bricks[i][j])
+                self.collision(self.__ball, self.__bricks[i][j])
 
     def play(self):
 
@@ -67,6 +85,7 @@ class Game:
                 
                 self.__input.flush()
 
+            self.handle_collisions()
             self.__ball.move(1)
             self.__screen.clear()
 
