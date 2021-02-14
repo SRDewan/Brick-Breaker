@@ -34,9 +34,16 @@ class Object:
     def setVel(self, newVel):
         self.__vel = newVel
 
-    def chckUpDn(self):
-        # ceiling and floor check
-        if(self.__pos[0] + self.__vel[0] < 0 or self.__pos[0] + self.__vel[0] + self.getDim()[0] - 1 >= rows):
+    def chckDown(self):
+        # floor check
+        if(self.__pos[0] + self.__vel[0] + self.getDim()[0] - 1 >= rows):
+            return True
+
+        return False
+
+    def chckUp(self):
+        # ceiling check
+        if(self.__pos[0] + self.__vel[0] < 0):
             return True
 
         return False
@@ -49,7 +56,7 @@ class Object:
         return False
 
     def move(self, flag=0):
-        # flag = 0 --> nothin, flag = 1 --> reflect, flag = 2 --> destroy
+        # flag = 0 --> nothing, flag = 1 --> reflect 
 
         if(not self.chckWall()):
             self.__pos[1] = self.__pos[1] + self.__vel[1]
@@ -58,17 +65,14 @@ class Object:
             self.__vel[1] *= -1
             self.__pos[1] = self.__pos[1] + self.__vel[1]
 
-        elif(flag == 2):
-            self.destroy()
-
-        if(not self.chckUpDn()):
+        if(not self.chckUp() and not self.chckDown()):
             self.__pos[0] = self.__pos[0] + self.__vel[0]
 
-        elif(flag == 1):
+        elif(flag == 1 and self.chckUp()):
             self.__vel[0] *= -1
             self.__pos[0] = self.__pos[0] + self.__vel[0]
 
-        elif(flag == 2):
+        elif(flag == 1 and self.chckDown()):
             self.destroy()
 
     def destroy(self):

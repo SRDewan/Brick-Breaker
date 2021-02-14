@@ -43,6 +43,18 @@ class Game:
         elif(txt == ' '):
             self.__paddle.release(self.__ball)
 
+    def collision(self, obj1, obj2):
+
+        if(pos1[0] in range(pos2[0], pos2[0] + dim2[0]) and pos1[0] in range(pos2[1], pos2[1] + dim2[1])):
+            pass
+
+    def handle_collisions(self):
+        collision(self.__ball, self.__paddle)
+
+        for i in range(0, len(self.__bricks)):
+            for j in range(0, len(self.__bricks[i])):
+                collision(self.__ball, self.__bricks[i][j])
+
     def play(self):
 
         os.system('cls' if os.name == 'nt' else 'clear')
