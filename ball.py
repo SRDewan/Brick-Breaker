@@ -6,5 +6,5 @@ class Ball(Object):
 
     def __init__(self, pos):
 
-        shape = listify("o")
+        shape = listify("O")
         super().__init__(shape, [font['black'], bg['black']], pos)
