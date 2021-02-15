@@ -150,7 +150,8 @@ class Game:
         self.__lives -= 1
 
         if(not self.__lives):
-            print(font['red'] + bg['reset'] + "You Lost! Game Over!")
+            self.__score -= (time.time() - self.__start) / 10
+            print(font['red'] + bg['reset'] + "You Lost! Game Over! Your final score is %.3f" %(self.__score))
             quit()
 
         for l in range(0, 6):
@@ -161,7 +162,8 @@ class Game:
         self.__paddle.setStick(True)
 
     def won(self):
-        print(font['red'] + bg['reset'] + "Congratulations! You Won!")
+        self.__score -= (time.time() - self.__start) / 10
+        print(font['red'] + bg['reset'] + "Congratulations! You Won! Your final score is %.3f" %(self.__score))
         quit()
 
     def timeCheck(self, tempTime, pup):
