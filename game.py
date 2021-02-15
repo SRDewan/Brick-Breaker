@@ -12,6 +12,7 @@ from screen import *
 from brick import *
 from paddle import *
 from ball import *
+from powerup import *
 from input import *
 
 class Game:
@@ -23,13 +24,21 @@ class Game:
         self.__score = 0
         self.__brickCtr = (int)((cols - 4) / 4)
         self.__bricks = []
+        self.__powers = []
         # np.empty((6, self.__brickCtr))
 
         for i in range(0, 6):
             self.__bricks.append([])
             for j in range(0, self.__brickCtr):
-                self.__bricks[i].append(Brick(0, [2 + 2 * i, 2 + 4 * j]))
+                if(i == j):
+                    self.__bricks[i].append(Brick(1, [2 + 2 * i, 2 + 4 * j]))
+
+                else:
+                    self.__bricks[i].append(Brick(0, [2 + 2 * i, 2 + 4 * j]))
         
+                if(self.__brickCtr - 1 - j == i):
+                    self.__powers.append(Powerup("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
 
@@ -87,6 +96,10 @@ class Game:
                     if(not self.__bricks[i][j].getActive()):
                         self.__score += points
 
+                        for k in range(0, 6):
+                            if(self.__powers[k].getPos() == self.__bricks[i][j].getPos()):
+                                self.__powers[k].fall()
+
                     if(ret == 1):
                         self.__ball.collide([-1 * self.__ball.getVel()[0], self.__ball.getVel()[1]])
 
@@ -115,6 +128,10 @@ class Game:
                 self.__input.flush()
 
             self.handle_collisions()
+
+            for l in range(0, 6):
+                self.__powers[l].move()
+
             self.__ball.move(1)
 
             if(not self.__ball.getActive()):
@@ -124,6 +141,9 @@ class Game:
 
             print(font['white'] + bg['reset'] + "Lives: ", self.__lives)
             print(font['white'] + bg['reset'] + "Score: ", self.__score)
+
+            for i in range(0, 6):
+                    self.__screen.populate(self.__powers[i])
 
             for i in range(0, 6):
                 for j in range(0, self.__brickCtr):

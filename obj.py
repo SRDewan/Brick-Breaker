@@ -78,7 +78,7 @@ class Object:
             self.__vel[0] *= -1
             self.__pos[0] = self.__pos[0] + self.__vel[0]
 
-        elif(flag == 1 and self.chckDown()):
+        elif(self.chckDown()):
             self.destroy()
 
     def collide(self, newVel):                                            
