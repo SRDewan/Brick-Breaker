@@ -59,6 +59,11 @@ class Game:
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
 
+    def findPup(self, type):
+        for x in self.__powers:
+            if(x.getType() == type):
+                return x
+
     def handle_input(self, txt):
         if(txt == 'a' or txt == 'A'):
             self.__paddle.keybrd(1, self.__ball)
@@ -68,7 +73,9 @@ class Game:
 
         elif(txt == ' '):
             self.__paddle.release(self.__ball)
-            self.__paddle.setStick(False)
+            
+            if(self.findPup(6).getTime() == -1):
+                self.__paddle.setStick(False)
 
     def verticalCol(self, pos1, pos2, dim1, dim2): 
         if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
@@ -128,22 +135,38 @@ class Game:
                     else:
                         self.__ball.collide([self.__ball.getVel()[0], -1 * self.__ball.getVel()[1]])
 
+        temp = []
         for i in range(0, len(self.__powers)):
             ret = self.collision(self.__powers[i], self.__paddle, False)
 
             if(ret):
                 self.__powers[i].collide()
-                self.__powers[i].power(self.__paddle, self.__ball)
+                temp.append(self.__powers[i])
+
+        for i in range(0, len(temp)):
+            temp[i].power(self.__paddle, self.__ball)
 
     def lifeLoss(self):
         self.__lives -= 1
 
         if(not self.__lives):
-            print(font['red'] + bg['reset'] + "Game Over!")
+            print(font['red'] + bg['reset'] + "You Lost! Game Over!")
             quit()
+
+        for l in range(0, 6):
+            if(self.__powers[l].getTime() != -1):
+                self.__powers[l].normal(self.__paddle, self.__ball)
 
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
         self.__paddle.setStick(True)
+
+    def won(self):
+        print(font['red'] + bg['reset'] + "Congratulations! You Won!")
+        quit()
+
+    def timeCheck(self, tempTime, pup):
+        if(pup.getTime() != -1 and tempTime - pup.getTime() - period >= 1e-3):
+            pup.normal(self.__paddle, self.__ball)
 
     def play(self):
 
@@ -159,7 +182,9 @@ class Game:
 
             self.handle_collisions()
 
+            tempTime = time.time()
             for l in range(0, 6):
+                self.timeCheck(tempTime, self.__powers[l])
                 self.__powers[l].move()
 
             self.__ball.move(1)
@@ -167,10 +192,24 @@ class Game:
             if(not self.__ball.getActive()):
                 self.lifeLoss()
 
+            win = True 
+            for i in range(0, len(self.__bricks)):
+                for j in range(0, len(self.__bricks[i])):
+                    if(self.__bricks[i][j].getType() != 1 and self.__bricks[i][j].getActive()):
+                        win = False 
+                        break
+
+                if(not win):
+                    break
+
+            if(win):
+                self.won()
+
             self.__screen.clear()
 
             print(font['white'] + bg['reset'] + "Lives: ", self.__lives)
             print(font['white'] + bg['reset'] + "Score: ", self.__score)
+            print(font['white'] + bg['reset'] + "Time: %.2f" %(time.time() - self.__start))
 
             for i in range(0, 6):
                     self.__screen.populate(self.__powers[i])

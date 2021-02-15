@@ -18,6 +18,9 @@ class Brick(Object):
         if(not self.__status):
             self.destroy()
 
+    def getType(self):
+        return self.__type
+
     def collide(self, thru=False):
         if(not self.__type and not thru):
             self.hit(self.__status - 1)

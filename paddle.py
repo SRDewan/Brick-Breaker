@@ -6,7 +6,7 @@ class Paddle(Object):
 
     def __init__(self, pos):
 
-        shape = listify("     ")
+        shape = listify(" " * padLen)
         self.__stick = True  # True => ball sticks to paddle, False => ball reflects
         super().__init__(shape, [font['black'], bg['white']], pos)
 

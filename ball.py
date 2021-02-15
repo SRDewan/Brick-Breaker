@@ -13,5 +13,5 @@ class Ball(Object):
     def getThru(self):
         return self.__thru 
 
-    def setThru(self):
-        self.__thru = True
+    def setThru(self, stat):
+        self.__thru = stat 
