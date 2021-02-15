@@ -106,6 +106,13 @@ class Game:
                     else:
                         self.__ball.collide([self.__ball.getVel()[0], -1 * self.__ball.getVel()[1]])
 
+        for i in range(0, len(self.__powers)):
+            ret = self.collision(self.__powers[i], self.__paddle, False)
+
+            if(ret):
+                # self.__paddle.collide(self.__ball)
+                self.__powers[i].collide()
+
     def lifeLoss(self):
         self.__lives -= 1
 

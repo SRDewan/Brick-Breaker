@@ -11,3 +11,6 @@ class Powerup(Object):
 
     def fall(self):
         self.setVel([jump, 0])
+
+    def collide(self):
+        self.destroy()
