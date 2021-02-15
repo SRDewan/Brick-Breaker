@@ -10,6 +10,9 @@ class Paddle(Object):
         self.__stick = True  # True => ball sticks to paddle, False => ball reflects
         super().__init__(shape, [font['black'], bg['white']], pos)
 
+    def setStick(self, stat):
+        self.__stick = stat 
+
     def stickChck(self, ball):
         ballPos = ball.getPos()
         paddlePos = self.getPos()
@@ -43,4 +46,8 @@ class Paddle(Object):
 
     def collide(self, ball):
         yvel = ball.getPos()[1] - self.getPos()[1] - (int)(self.getDim()[1] / 2)
-        ball.setVel([ball.getVel()[0], yvel])
+        if(not self.__stick):
+            ball.setVel([ball.getVel()[0], yvel])
+
+        else:
+            ball.setVel([0, 0])

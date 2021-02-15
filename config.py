@@ -16,6 +16,9 @@ font = {
         "reset": col.Fore.RESET,
         }
 
+for i in font:
+    font[i] += col.Style.BRIGHT
+
 bg = {
         "red": col.Back.RED,
         "blue": col.Back.BLUE,
@@ -35,3 +38,4 @@ brickCol = [["black", "red", "yellow", "green"],
 delay = 0.2
 jump = 1
 points = 5
+period = 30

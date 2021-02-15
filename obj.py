@@ -37,6 +37,12 @@ class Object:
     def getColor(self):
         return self.__color[:]
 
+    def getShape(self):
+        return self.__shape[:]
+
+    def setShape(self, shape):
+        self.__shape = shape 
+
     def setColor(self, color):
         self.__color = color  
 

@@ -22,6 +22,7 @@ class Game:
         self.__screen = Screen()
         self.__lives = 3
         self.__score = 0
+        self.__start = time.time()
         self.__brickCtr = (int)((cols - 4) / 4)
         self.__bricks = []
         self.__powers = []
@@ -37,7 +38,23 @@ class Game:
                     self.__bricks[i].append(Brick(0, [2 + 2 * i, 2 + 4 * j]))
         
                 if(self.__brickCtr - 1 - j == i):
-                    self.__powers.append(Powerup("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                    if(i == 0):
+                        self.__powers.append(padExpand("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+
+                    elif(i == 1):
+                        self.__powers.append(padShrink("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+
+                    elif(i == 2):
+                        self.__powers.append(ballMul("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+
+                    elif(i == 3):
+                        self.__powers.append(ballFast("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+
+                    elif(i == 4):
+                        self.__powers.append(ballThru("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                        
+                    elif(i == 5):
+                        self.__powers.append(padGrab("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
 
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
@@ -51,6 +68,7 @@ class Game:
 
         elif(txt == ' '):
             self.__paddle.release(self.__ball)
+            self.__paddle.setStick(False)
 
     def verticalCol(self, pos1, pos2, dim1, dim2): 
         if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
@@ -92,13 +110,17 @@ class Game:
                 ret = self.collision(self.__ball, self.__bricks[i][j])
 
                 if(ret):
-                    self.__bricks[i][j].collide()
+                    thru = self.__ball.getThru()
+                    self.__bricks[i][j].collide(thru)
                     if(not self.__bricks[i][j].getActive()):
                         self.__score += points
 
                         for k in range(0, 6):
                             if(self.__powers[k].getPos() == self.__bricks[i][j].getPos()):
                                 self.__powers[k].fall()
+
+                    if(thru):
+                        continue
 
                     if(ret == 1):
                         self.__ball.collide([-1 * self.__ball.getVel()[0], self.__ball.getVel()[1]])
@@ -110,8 +132,8 @@ class Game:
             ret = self.collision(self.__powers[i], self.__paddle, False)
 
             if(ret):
-                # self.__paddle.collide(self.__ball)
                 self.__powers[i].collide()
+                self.__powers[i].power(self.__paddle, self.__ball)
 
     def lifeLoss(self):
         self.__lives -= 1
@@ -121,6 +143,7 @@ class Game:
             quit()
 
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
+        self.__paddle.setStick(True)
 
     def play(self):
 

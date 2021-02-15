@@ -8,3 +8,10 @@ class Ball(Object):
 
         shape = listify("O")
         super().__init__(shape, [font['black'], bg['black']], pos)
+        self.__thru = False
+
+    def getThru(self):
+        return self.__thru 
+
+    def setThru(self):
+        self.__thru = True
