@@ -37,7 +37,7 @@ brickCol = [["black", "red", "yellow", "green"],
 
 padLen = 5
 change = 2
-delay = 0.2
+fps = 30
 jump = 1
 points = 5
 period = 15

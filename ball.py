@@ -8,6 +8,7 @@ class Ball(Object):
 
         shape = listify("O")
         super().__init__(shape, [font['black'], bg['black']], pos)
+        self.setFrame(2)
         self.__thru = False
 
     def getThru(self):

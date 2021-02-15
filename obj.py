@@ -11,6 +11,7 @@ class Object:
        self.__pos = pos      # pos = [x, y] of top left corner pixel/character of obj
        self.__vel = vel      # vel = [xvel, yvel]
        self.__active = active 
+       self.__frame = 1
 
     def draw(self, grid):
         [xlen, ylen] = getShape(self.__shape)
@@ -27,6 +28,12 @@ class Object:
 
     def getPos(self):
         return self.__pos[:]
+
+    def getFrame(self):
+        return self.__frame
+
+    def setFrame(self, newFrame):
+        self.__frame = newFrame
 
     def getVel(self):
         return self.__vel[:]

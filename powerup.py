@@ -1,6 +1,7 @@
 import time
 
-from config import *
+# from config import *
+import config
 from obj import *
 from util import *
 
@@ -12,6 +13,7 @@ class Powerup(Object):
         self.__type = type
         self.__time = -1
         super().__init__(shape, [font['blue'], bg['black']], pos)
+        self.setFrame(3)
 
     def getType(self):
         return self.__type
@@ -69,6 +71,14 @@ class ballFast(Powerup):
     
     def __init__(self, shape, pos):
         super().__init__("...", pos, 4)
+
+    def power(self, paddle, ball):
+        ball.setFrame(ball.getFrame() - 1)
+        self.setTime(time.time())
+
+    def normal(self, paddle, ball):
+        ball.setFrame(ball.getFrame() + 1)
+        self.setTime(-1)
 
 class ballThru(Powerup):
     

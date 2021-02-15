@@ -137,6 +137,9 @@ class Game:
 
         temp = []
         for i in range(0, len(self.__powers)):
+            if(not self.__powers[i].getActive()):
+                continue
+
             ret = self.collision(self.__powers[i], self.__paddle, False)
 
             if(ret):
@@ -173,6 +176,7 @@ class Game:
     def play(self):
 
         os.system('cls' if os.name == 'nt' else 'clear')
+        ctr = 0
 
         while True:
 
@@ -187,9 +191,12 @@ class Game:
             tempTime = time.time()
             for l in range(0, 6):
                 self.timeCheck(tempTime, self.__powers[l])
-                self.__powers[l].move()
 
-            self.__ball.move(1)
+                if(ctr % self.__powers[l].getFrame() == 0):
+                    self.__powers[l].move()
+
+            if(ctr % self.__ball.getFrame() == 0):
+                self.__ball.move(1)
 
             if(not self.__ball.getActive()):
                 self.lifeLoss()
@@ -225,4 +232,7 @@ class Game:
 
             self.__screen.disp()
 
-            time.sleep(delay)
+            time.sleep(1 / fps)
+            ctr += 1
+            if(ctr == 7):
+                ctr = 1
