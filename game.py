@@ -58,21 +58,23 @@ class Game:
 
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
+        self.__ball2 = Ball(self.__ball.getPos())
+        self.__ball2.destroy()
 
     def findPup(self, type):
         for x in self.__powers:
             if(x.getType() == type):
                 return x
 
-    def handle_input(self, txt):
+    def handle_input(self, txt, ball):
         if(txt == 'a' or txt == 'A'):
-            self.__paddle.keybrd(1, self.__ball)
+            self.__paddle.keybrd(1, ball)
 
         elif(txt == 'd' or txt == 'D'):
-            self.__paddle.keybrd(0, self.__ball)
+            self.__paddle.keybrd(0, ball)
 
         elif(txt == ' '):
-            self.__paddle.release(self.__ball)
+            self.__paddle.release(ball)
             
             if(self.findPup(6).getTime() == -1):
                 self.__paddle.setStick(False)
@@ -102,22 +104,22 @@ class Game:
 
         return 0 
 
-    def handle_collisions(self):
-        ret = self.collision(self.__ball, self.__paddle, False)
+    def handle_collisions(self, ball):
+        ret = self.collision(ball, self.__paddle, False)
 
         if(ret):
-            self.__paddle.collide(self.__ball)
-            self.__ball.collide([-1 * self.__ball.getVel()[0], self.__ball.getVel()[1]])
+            self.__paddle.collide(ball)
+            ball.collide([-1 * ball.getVel()[0], ball.getVel()[1]])
 
         for i in range(0, len(self.__bricks)):
             for j in range(0, len(self.__bricks[i])):
                 if(not self.__bricks[i][j].getActive()):
                     continue
 
-                ret = self.collision(self.__ball, self.__bricks[i][j])
+                ret = self.collision(ball, self.__bricks[i][j])
 
                 if(ret):
-                    thru = self.__ball.getThru()
+                    thru = ball.getThru()
                     self.__bricks[i][j].collide(thru)
                     if(not self.__bricks[i][j].getActive()):
                         self.__score += points
@@ -130,11 +132,12 @@ class Game:
                         continue
 
                     if(ret == 1):
-                        self.__ball.collide([-1 * self.__ball.getVel()[0], self.__ball.getVel()[1]])
+                        ball.collide([-1 * ball.getVel()[0], ball.getVel()[1]])
 
                     else:
-                        self.__ball.collide([self.__ball.getVel()[0], -1 * self.__ball.getVel()[1]])
+                        ball.collide([ball.getVel()[0], -1 * ball.getVel()[1]])
 
+    def padPowCol(self):
         temp = []
         for i in range(0, len(self.__powers)):
             if(not self.__powers[i].getActive()):
@@ -147,9 +150,20 @@ class Game:
                 temp.append(self.__powers[i])
 
         for i in range(0, len(temp)):
+            if(temp[i].getType() == 3 or temp[i].getType() == 4 or temp[i].getType() == 5):
+                temp[i].power(self.__ball, self.__ball2)
+                continue
+
             temp[i].power(self.__paddle, self.__ball)
 
     def lifeLoss(self):
+
+        if(self.__ball2.getActive()):
+            tmpBall = self.__ball
+            self.__ball = self.__ball2
+            self.__ball2 = tmpBall
+            return
+
         self.__lives -= 1
 
         if(not self.__lives):
@@ -159,6 +173,11 @@ class Game:
 
         for l in range(0, 6):
             if(self.__powers[l].getTime() != -1):
+
+                if(self.__powers[l].getType() == 3 or self.__powers[l].getType() == 4 or self.__powers[l].getType() == 5):
+                    self.__powers[l].normal(self.__ball, self.__ball2)
+                    continue
+
                 self.__powers[l].normal(self.__paddle, self.__ball)
 
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
@@ -171,6 +190,10 @@ class Game:
 
     def timeCheck(self, tempTime, pup):
         if(pup.getTime() != -1 and tempTime - pup.getTime() - period >= 1e-3):
+            if(pup.getType() == 3 or pup.getType() == 4 or pup.getType() == 5):
+                pup.normal(self.__ball, self.__ball2)
+                return
+
             pup.normal(self.__paddle, self.__ball)
 
     def play(self):
@@ -182,11 +205,19 @@ class Game:
 
             if self.__input.kbhit():
                 inp = self.__input.getch()
-                self.handle_input(inp)
+
+                if(self.__ball2.getActive() and self.__paddle.stickChck(self.__ball2)):
+                    self.handle_input(inp, self.__ball2)
+
+                else:
+                    self.handle_input(inp, self.__ball)
                 
                 self.__input.flush()
 
-            self.handle_collisions()
+            self.handle_collisions(self.__ball)
+            if(self.__ball2.getActive()):
+                self.handle_collisions(self.__ball2)
+            self.padPowCol()
 
             tempTime = time.time()
             for l in range(0, 6):
@@ -197,6 +228,7 @@ class Game:
 
             if(ctr % self.__ball.getFrame() == 0):
                 self.__ball.move(1)
+                self.__ball2.move(1)
 
             if(not self.__ball.getActive()):
                 self.lifeLoss()
@@ -229,6 +261,7 @@ class Game:
 
             self.__screen.populate(self.__paddle)
             self.__screen.populate(self.__ball)
+            self.__screen.populate(self.__ball2)
 
             self.__screen.disp()
 

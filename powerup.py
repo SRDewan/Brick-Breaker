@@ -67,16 +67,36 @@ class ballMul(Powerup):
     def __init__(self, shape, pos):
         super().__init__("2xO", pos, 3)
 
+    def power(self, obj1, ball):
+        tempo = obj1.getVel()[:]
+
+        if(not tempo[1]):
+            tempo[1] += 1
+        else:
+            tempo[1] *= -1
+
+        ball.activate(obj1.getPos()[:])
+        ball.setVel(tempo)
+
+        self.setTime(time.time())
+
+    def normal(self, obj1, ball):
+        ball.setVel([0, 0])
+        ball.destroy()
+        self.setTime(-1)
+
 class ballFast(Powerup):
     
     def __init__(self, shape, pos):
         super().__init__("...", pos, 4)
 
-    def power(self, paddle, ball):
+    def power(self, obj1, ball):
+        obj1.setFrame(ball.getFrame() - 1)
         ball.setFrame(ball.getFrame() - 1)
         self.setTime(time.time())
 
-    def normal(self, paddle, ball):
+    def normal(self, obj1, ball):
+        obj1.setFrame(ball.getFrame() + 1)
         ball.setFrame(ball.getFrame() + 1)
         self.setTime(-1)
 
@@ -85,11 +105,13 @@ class ballThru(Powerup):
     def __init__(self, shape, pos):
         super().__init__("XoX", pos, 5)
 
-    def power(self, paddle, ball):
+    def power(self, obj1, ball):
+        obj1.setThru(True)
         ball.setThru(True)
         self.setTime(time.time())
 
-    def normal(self, paddle, ball):
+    def normal(self, obj1, ball):
+        obj1.setThru(False)
         ball.setThru(False)
         self.setTime(-1)
 

@@ -100,5 +100,9 @@ class Object:
     def getActive(self):
         return self.__active
 
+    def activate(self, pos):
+        self.__active = True
+        self.__pos = pos[:]
+
     def destroy(self):
         self.__active = False
