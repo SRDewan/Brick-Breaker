@@ -10,9 +10,16 @@ class Ball(Object):
         super().__init__(shape, [font['black'], bg['black']], pos)
         self.setFrame(2)
         self.__thru = False
+        self.__oldyVel = 0
 
     def getThru(self):
         return self.__thru 
 
     def setThru(self, stat):
         self.__thru = stat 
+
+    def getOldVel(self):
+        return self.__oldyVel
+
+    def setOldVel(self, new):
+        self.__oldyVel = new 

@@ -42,7 +42,7 @@ class Paddle(Object):
 
     def release(self, ball):
         if(self.stickChck(ball)):
-            ball.setVel([-1 * jump, 0])
+            ball.setVel([-1 * jump, ball.getOldVel()])
 
     def collide(self, ball):
         yvel = ball.getPos()[1] - self.getPos()[1] - (int)(self.getDim()[1] / 2)
@@ -50,4 +50,5 @@ class Paddle(Object):
             ball.setVel([ball.getVel()[0], yvel])
 
         else:
+            ball.setOldVel(yvel)
             ball.setVel([0, 0])
