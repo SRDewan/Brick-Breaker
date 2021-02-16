@@ -23,38 +23,50 @@ class Game:
         self.__lives = 3
         self.__score = 0
         self.__start = time.time()
-        self.__brickCtr = (int)((cols - 4) / 4)
+        self.__brickCtr = (int)((cols - 4) / 3)
         self.__bricks = []
         self.__powers = []
+        self.__explode = []
         # np.empty((6, self.__brickCtr))
 
         for i in range(0, 6):
             self.__bricks.append([])
             for j in range(0, self.__brickCtr):
                 if(i == j):
-                    self.__bricks[i].append(Brick(1, [2 + 2 * i, 2 + 4 * j]))
+                    self.__bricks[i].append(Brick(1, [2 + i, 2 + 3 * j]))
+                # placing unbreakable bricks
+
+                elif(i == j - 1):
+                    self.__bricks[i].append(Brick(2, [2 + i, 2 + 3 * j]))
+                # placing exploding bricks
+
+                elif(self.__brickCtr - 2 - j == i):
+                    self.__bricks[i].append(Brick(2, [2 + i, 2 + 3 * j]))
+                # placing exploding bricks
 
                 else:
-                    self.__bricks[i].append(Brick(0, [2 + 2 * i, 2 + 4 * j]))
+                    self.__bricks[i].append(Brick(0, [2 + i, 2 + 3 * j]))
+                # placing normal bricks
         
+                # placing powerups 
                 if(self.__brickCtr - 1 - j == i):
                     if(i == 0):
-                        self.__powers.append(padExpand("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                        self.__powers.append(padExpand("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
 
                     elif(i == 1):
-                        self.__powers.append(padShrink("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                        self.__powers.append(padShrink("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
 
                     elif(i == 2):
-                        self.__powers.append(ballMul("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                        self.__powers.append(ballMul("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
 
                     elif(i == 3):
-                        self.__powers.append(ballFast("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                        self.__powers.append(ballFast("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
 
                     elif(i == 4):
-                        self.__powers.append(ballThru("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                        self.__powers.append(ballThru("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
                         
                     elif(i == 5):
-                        self.__powers.append(padGrab("%d%d%d"%(i, i, i), [2 + 2 * i, 2 + 4 * j]))
+                        self.__powers.append(padGrab("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
 
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
@@ -104,6 +116,42 @@ class Game:
 
         return 0 
 
+    def findBrickByPos(self, pos):
+        for m in range(0, len(self.__bricks)):
+            for n in range(0, len(self.__bricks[m])):
+                if(self.__bricks[m][n].getPos() == pos):
+                    if(not self.__bricks[m][n].getActive()):
+                        return None
+                    return self.__bricks[m][n]
+
+    def findBricks(self, brick):
+        posit = brick.getPos()
+        dim = brick.getDim()
+
+        if(brick.getType() == 2):
+            for a in range(posit[0] - 1 * dim[0], posit[0] + 2 * dim[0], dim[0]):
+                for b in range(posit[1] - 1 * dim[1], posit[1] + 2 * dim[1], dim[1]):
+                    if(a == posit[0] and b == posit[1]):
+                        continue
+
+                    ret = self.findBrickByPos([a, b])
+                    if(ret != None):
+                        self.__explode.append(ret)
+
+    def explosion(self):
+        length = len(self.__explode)
+        for z in range(0, length):
+            self.findBricks(self.__explode[z])
+            self.__explode[z].collide(True)
+            self.__score += points
+
+            for k in range(0, 6):
+                if(self.__powers[k].getPos() == self.__explode[z].getPos()):
+                    self.__powers[k].fall()
+
+        for z in range(0, length):
+            del self.__explode[0]
+
     def handle_collisions(self, ball):
         ret = self.collision(ball, self.__paddle, False)
 
@@ -120,6 +168,7 @@ class Game:
 
                 if(ret):
                     thru = ball.getThru()
+                    self.findBricks(self.__bricks[i][j])
                     self.__bricks[i][j].collide(thru)
                     if(not self.__bricks[i][j].getActive()):
                         self.__score += points
@@ -213,6 +262,9 @@ class Game:
                     self.handle_input(inp, self.__ball)
                 
                 self.__input.flush()
+
+            if(len(self.__explode)):
+                self.explosion()
 
             self.handle_collisions(self.__ball)
             if(self.__ball2.getActive()):

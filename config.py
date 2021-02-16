@@ -32,7 +32,7 @@ bg = {
 
 brickCol = [["black", "red", "yellow", "green"],
             ["purple", "purple", "purple", "purple"],
-            ["white", "white", "white", "white"],
+            ["blue", "blue", "blue", "blue"],
         ]
 
 padLen = 5

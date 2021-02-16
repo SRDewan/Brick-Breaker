@@ -88,7 +88,7 @@ class ballMul(Powerup):
 class ballFast(Powerup):
     
     def __init__(self, shape, pos):
-        super().__init__("...", pos, 4)
+        super().__init__(">>>", pos, 4)
 
     def power(self, obj1, ball):
         obj1.setFrame(ball.getFrame() - 1)
@@ -103,7 +103,7 @@ class ballFast(Powerup):
 class ballThru(Powerup):
     
     def __init__(self, shape, pos):
-        super().__init__("XoX", pos, 5)
+        super().__init__("XXX", pos, 5)
 
     def power(self, obj1, ball):
         obj1.setThru(True)
