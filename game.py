@@ -97,25 +97,6 @@ class Game:
 
         return True 
 
-    def collision(self, obj1, obj2, horizontal=True, thru=False):
-        # obj1 always moving obj such as ball
-
-        pos1 = np.array(obj1.getPos()[:]) + np.array(obj1.getVel()[:])
-        dim1 = obj1.getDim()[:]
-
-        pos2 = np.array(obj2.getPos()[:]) + np.array(obj2.getVel()[:])
-        dim2 = obj2.getDim()[:]
-
-        if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
-            if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
-                if(self.verticalCol(obj1.getPos(), obj2.getPos(), dim1, dim2)):
-                    return 1 
-
-                elif(horizontal):
-                    return 2 
-
-        return 0 
-
     def findBrickByPos(self, pos):
         for m in range(0, len(self.__bricks)):
             for n in range(0, len(self.__bricks[m])):
@@ -152,39 +133,90 @@ class Game:
         for z in range(0, length):
             del self.__explode[0]
 
-    def handle_collisions(self, ball):
-        ret = self.collision(ball, self.__paddle, False)
+    def colChck(self, pos1, dim1, pos2, dim2):
+        if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
+            if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
+                return True
 
-        if(ret):
-            self.__paddle.collide(ball)
-            ball.collide([-1 * ball.getVel()[0], ball.getVel()[1]])
+        return False
 
-        for i in range(0, len(self.__bricks)):
-            for j in range(0, len(self.__bricks[i])):
-                if(not self.__bricks[i][j].getActive()):
+    def collision(self, obj, flags):
+        # obj always moving obj such as ball or powerup
+        # flags[0] --> paddle interaction type, flags[1] --> brick interaction type
+
+        p1 = np.array(obj.getPos()[:])
+        v1 = np.array(obj.getVel()[:])
+        dim1 = obj.getDim()[:]
+
+        sign = [1, 1]
+
+        if(v1[0]):
+            sign[0] = (int)(v1[0] / abs(v1[0]))
+
+        if(v1[1]):
+            sign[1] = (int)(v1[1] / abs(v1[1]))
+
+        for r in range(0, abs(v1[0]) + 1):
+            for c in range(0, abs(v1[1]) + 1):
+                cr = p1[0] + r * sign[0]
+                cc = p1[1] + c * sign[1]
+                pos1 = [cr, cc]
+
+                if(cr == p1[0] and cc == p1[1]):
                     continue
 
-                ret = self.collision(ball, self.__bricks[i][j])
+                if(flags[0] == 1):
+                    pos2 = np.array(self.__paddle.getPos()) + np.array(self.__paddle.getVel())
+                    dim2 = self.__paddle.getDim()
 
-                if(ret):
-                    thru = ball.getThru()
-                    self.findBricks(self.__bricks[i][j])
-                    self.__bricks[i][j].collide(thru)
-                    if(not self.__bricks[i][j].getActive()):
-                        self.__score += points
+                    if(self.colChck(pos1, dim1, pos2, dim2)):
+                        if(self.verticalCol(obj.getPos(), self.__paddle.getPos(), dim1, dim2)):
+                            self.__paddle.collide(obj)
+                            obj.collide([-1 * obj.getVel()[0], obj.getVel()[1]])
 
-                        for k in range(0, 6):
-                            if(self.__powers[k].getPos() == self.__bricks[i][j].getPos()):
-                                self.__powers[k].fall()
+                elif(flags[0] == 2):
 
-                    if(thru):
-                        continue
+                    pos2 = np.array(self.__paddle.getPos()) + np.array(self.__paddle.getVel())
+                    dim2 = self.__paddle.getDim()
 
-                    if(ret == 1):
-                        ball.collide([-1 * ball.getVel()[0], ball.getVel()[1]])
+                    if(self.colChck(pos1, dim1, pos2, dim2)):
+                        if(self.verticalCol(obj.getPos(), self.__paddle.getPos(), dim1, dim2)):
+                            return 1
 
-                    else:
-                        ball.collide([ball.getVel()[0], -1 * ball.getVel()[1]])
+                if(flags[1]):
+
+                    for i in range(0, len(self.__bricks)):
+                        for j in range(0, len(self.__bricks[i])):
+                            if(not self.__bricks[i][j].getActive()):
+                                continue
+
+                            pos2 = np.array(self.__bricks[i][j].getPos()) + np.array(self.__bricks[i][j].getVel())
+                            dim2 = self.__bricks[i][j].getDim()
+
+                            if(self.colChck(pos1, dim1, pos2, dim2)):
+
+                                thru = obj.getThru()
+                                self.findBricks(self.__bricks[i][j])
+                                self.__bricks[i][j].collide(thru)
+                                if(not self.__bricks[i][j].getActive()):
+                                    self.__score += points
+
+                                    for k in range(0, 6):
+                                        if(self.__powers[k].getPos() == self.__bricks[i][j].getPos()):
+                                            self.__powers[k].fall()
+
+                                if(thru):
+                                    continue
+
+                                if(self.verticalCol(obj.getPos(), self.__bricks[i][j].getPos(), dim1, dim2)):
+                                    obj.collide([-1 * obj.getVel()[0], obj.getVel()[1]])
+                                    return
+
+                                else:
+                                    obj.collide([obj.getVel()[0], -1 * obj.getVel()[1]])
+                                    return
+
+        return 0 
 
     def padPowCol(self):
         temp = []
@@ -192,7 +224,7 @@ class Game:
             if(not self.__powers[i].getActive()):
                 continue
 
-            ret = self.collision(self.__powers[i], self.__paddle, False)
+            ret = self.collision(self.__powers[i], [2, 0])
 
             if(ret):
                 self.__powers[i].collide()
@@ -266,9 +298,9 @@ class Game:
             if(len(self.__explode)):
                 self.explosion()
 
-            self.handle_collisions(self.__ball)
+            self.collision(self.__ball, [1, 1])
             if(self.__ball2.getActive()):
-                self.handle_collisions(self.__ball2)
+                self.collision(self.__ball2, [1, 1])
             self.padPowCol()
 
             tempTime = time.time()
