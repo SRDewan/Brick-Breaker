@@ -4,6 +4,7 @@ import time
 import config
 from obj import *
 from util import *
+from ball import *
 
 class Powerup(Object):
 
@@ -41,7 +42,7 @@ class padExpand(Powerup):
     def __init__(self, pos):
         super().__init__("<=>", pos, 1)
 
-    def power(self, paddle, ball):
+    def power(self, paddle, balls):
         if(cols - paddle.getPos()[1] - paddle.getDim()[1] >= change):
             paddle.setShape(listify(" " * (paddle.getDim()[1] + change)))
 
@@ -50,7 +51,7 @@ class padShrink(Powerup):
     def __init__(self, pos):
         super().__init__(">=<", pos, 2)
 
-    def power(self, paddle, ball):
+    def power(self, paddle, balls):
         if(paddle.getDim()[1] > change):
             paddle.setShape(listify(" " * (paddle.getDim()[1] - change)))
 
@@ -59,48 +60,51 @@ class ballMul(Powerup):
     def __init__(self, pos):
         super().__init__("2xO", pos, 3)
 
-    def power(self, obj1, ball):
-        tempo = obj1.getVel()[:]
+    def power(self, paddle, balls):
+        length = len(balls)
 
-        if(not tempo[1]):
-            tempo[1] += 1
-        else:
-            tempo[1] *= -1
+        for ind in range(0, length):
+            tempos = balls[ind].getPos()
+            temvel = balls[ind].getVel()
 
-        ball.activate(obj1.getPos()[:])
-        ball.setVel(tempo)
+            if(not temvel[1]):
+                temvel[1] += 1
+            else:
+                temvel[1] *= -1
 
-        self.setTime(time.time())
+            balls.append(Ball(tempos))
+            balls[len(balls) - 1].setVel(temvel)
 
-    def normal(self, obj1, ball):
-        ball.setVel([0, 0])
-        ball.destroy()
-        self.setTime(-1)
+    def normal(self, paddle, balls, num):
+        length = len(balls)
+
+        for ind in range(length - 1, num - 1, -1):
+            del balls[ind]
 
 class ballFast(Powerup):
     
     def __init__(self, pos):
         super().__init__(">>>", pos, 4)
 
-    def power(self, obj1, ball):
-        if(obj1.getFrame() > 1):
-            obj1.setFrame(ball.getFrame() - 1)
-            ball.setFrame(ball.getFrame() - 1)
+    def power(self, paddle, balls):
+        for ball in balls:
+            if(ball.getFrame() > 1):
+                ball.setFrame(ball.getFrame() - 1)
 
 class ballThru(Powerup):
     
     def __init__(self, pos):
         super().__init__("XXX", pos, 5)
 
-    def power(self, obj1, ball):
-        obj1.setThru(True)
-        ball.setThru(True)
+    def power(self, paddle, balls):
+        for ball in balls:
+            ball.setThru(True)
 
 class padGrab(Powerup):
     
     def __init__(self, pos):
         super().__init__("|_|", pos, 6)
 
-    def power(self, paddle, ball):
+    def power(self, paddle, balls):
         paddle.setStick(True)
 

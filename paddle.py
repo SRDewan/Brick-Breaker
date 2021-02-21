@@ -26,26 +26,27 @@ class Paddle(Object):
         else:
             return False
 
-    def keybrd(self, dirn, ball):
+    def keybrd(self, dirn, balls):
         # dirn = 0 --> right, dirn = 1 --> left 
         oldPos = self.getPos()
-        ballPos = ball.getPos()
-
         oldVel = self.getVel()
-        self.setVel([oldVel[0], pow(-1, dirn) * abs(jump)])
 
+        self.setVel([oldVel[0], pow(-1, dirn) * abs(jump)])
         self.move()
         self.setVel([0, 0])
 
-        if(oldPos != self.getPos() and self.stickChck(ball)):
-        
-            ball.setVel([oldVel[0], pow(-1, dirn) * abs(jump)])
-            ball.move()
-            ball.setVel([0, 0])
+        for ball in balls:
+            ballPos = ball.getPos()
 
-    def release(self, ball):
-        if(self.stickChck(ball)):
-            ball.setVel([-1 * jump, ball.getOldVel()])
+            if(oldPos != self.getPos() and self.stickChck(ball)):
+                ball.setVel([oldVel[0], pow(-1, dirn) * abs(jump)])
+                ball.move()
+                ball.setVel([0, 0])
+
+    def release(self, balls):
+        for ball in balls:
+            if(self.stickChck(ball)):
+                ball.setVel([-1 * jump, ball.getOldVel()])
 
     def collide(self, ball):
         yvel = ball.getPos()[1] - self.getPos()[1] - (int)(self.getDim()[1] / 2)
