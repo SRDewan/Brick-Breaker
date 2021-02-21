@@ -8,7 +8,7 @@ class Ball(Object):
 
         shape = listify("O")
         super().__init__(shape, [font['black'], bg['black']], pos)
-        self.setFrame(5)
+        self.setFrame(ballFps)
         self.__thru = False
         self.__oldyVel = 0
 

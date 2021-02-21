@@ -13,7 +13,7 @@ class Powerup(Object):
         self.__type = type
         self.__time = -1
         super().__init__(shape, [font['blue'], bg['black']], pos)
-        self.setFrame(10)
+        self.setFrame(powFps)
 
     def getType(self):
         return self.__type
@@ -42,12 +42,8 @@ class padExpand(Powerup):
         super().__init__("<=>", pos, 1)
 
     def power(self, paddle, ball):
-        paddle.setShape(listify(" " * (paddle.getDim()[1] + change)))
-        self.setTime(time.time())
-
-    def normal(self, paddle, ball):
-        paddle.setShape(listify(" " * (paddle.getDim()[1] - change)))
-        self.setTime(-1)
+        if(cols - paddle.getPos()[1] - paddle.getDim()[1] >= change):
+            paddle.setShape(listify(" " * (paddle.getDim()[1] + change)))
 
 class padShrink(Powerup):
     
@@ -55,12 +51,8 @@ class padShrink(Powerup):
         super().__init__(">=<", pos, 2)
 
     def power(self, paddle, ball):
-        paddle.setShape(listify(" " * (paddle.getDim()[1] - change)))
-        self.setTime(time.time())
-
-    def normal(self, paddle, ball):
-        paddle.setShape(listify(" " * (paddle.getDim()[1] + change)))
-        self.setTime(-1)
+        if(paddle.getDim()[1] > change):
+            paddle.setShape(listify(" " * (paddle.getDim()[1] - change)))
 
 class ballMul(Powerup):
     
@@ -91,14 +83,9 @@ class ballFast(Powerup):
         super().__init__(">>>", pos, 4)
 
     def power(self, obj1, ball):
-        obj1.setFrame(ball.getFrame() - 1)
-        ball.setFrame(ball.getFrame() - 1)
-        self.setTime(time.time())
-
-    def normal(self, obj1, ball):
-        obj1.setFrame(ball.getFrame() + 1)
-        ball.setFrame(ball.getFrame() + 1)
-        self.setTime(-1)
+        if(obj1.getFrame() > 1):
+            obj1.setFrame(ball.getFrame() - 1)
+            ball.setFrame(ball.getFrame() - 1)
 
 class ballThru(Powerup):
     
@@ -108,12 +95,6 @@ class ballThru(Powerup):
     def power(self, obj1, ball):
         obj1.setThru(True)
         ball.setThru(True)
-        self.setTime(time.time())
-
-    def normal(self, obj1, ball):
-        obj1.setThru(False)
-        ball.setThru(False)
-        self.setTime(-1)
 
 class padGrab(Powerup):
     
@@ -122,10 +103,4 @@ class padGrab(Powerup):
 
     def power(self, paddle, ball):
         paddle.setStick(True)
-        self.setTime(time.time())
-
-    def normal(self, paddle, ball):
-        paddle.release(ball)
-        paddle.setStick(False)
-        self.setTime(-1)
 

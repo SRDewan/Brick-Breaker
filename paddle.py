@@ -10,6 +10,9 @@ class Paddle(Object):
         self.__stick = True  # True => ball sticks to paddle, False => ball reflects
         super().__init__(shape, [font['black'], bg['white']], pos)
 
+    def getStick(self):
+        return self.__stick
+
     def setStick(self, stat):
         self.__stick = stat 
 

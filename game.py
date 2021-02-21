@@ -27,6 +27,7 @@ class Game:
         self.__bricks = []
         self.__powers = []
         self.__explode = []
+        self.__lifeRec = True
         # np.empty((6, self.__brickCtr))
 
         for i in range(0, 6):
@@ -87,6 +88,7 @@ class Game:
 
         elif(txt == ' '):
             self.__paddle.release(ball)
+            self.__lifeRec = False
             
             if(self.findPup(6).getTime() == -1):
                 self.__paddle.setStick(False)
@@ -219,6 +221,29 @@ class Game:
 
         return 0 
 
+    def activation(self):
+        for i in range(0, len(self.__powers)):
+            if(self.__powers[i].getTime() != -1):
+                if(self.__powers[i].getType() == 3): 
+                    continue
+
+                if(self.__powers[i].getType() == 3 or self.__powers[i].getType() == 4 or self.__powers[i].getType() == 5):
+                    self.__powers[i].power(self.__ball, self.__ball2)
+                    continue
+
+                self.__powers[i].power(self.__paddle, self.__ball)
+
+    def reset(self):
+        self.__paddle.setShape(listify(" " * padLen))
+        if(not self.__lifeRec):
+            self.__paddle.setStick(False)
+
+        self.__ball.setFrame(ballFps)
+        self.__ball2.setFrame(ballFps)
+
+        self.__ball.setThru(False)
+        self.__ball2.setThru(False)
+
     def padPowCol(self):
         temp = []
         for i in range(0, len(self.__powers)):
@@ -232,11 +257,11 @@ class Game:
                 temp.append(self.__powers[i])
 
         for i in range(0, len(temp)):
-            if(temp[i].getType() == 3 or temp[i].getType() == 4 or temp[i].getType() == 5):
-                temp[i].power(self.__ball, self.__ball2)
-                continue
+            temp[i].setTime(time.time())
 
-            temp[i].power(self.__paddle, self.__ball)
+            ctype = temp[i].getType()
+            if(ctype == 1 or ctype == 2 or ctype == 3):
+                self.__paddle.release(self.__ball)
 
     def lifeLoss(self):
 
@@ -256,13 +281,10 @@ class Game:
         for l in range(0, 6):
             if(self.__powers[l].getTime() != -1):
 
-                if(self.__powers[l].getType() == 3 or self.__powers[l].getType() == 4 or self.__powers[l].getType() == 5):
-                    self.__powers[l].normal(self.__ball, self.__ball2)
-                    continue
-
-                self.__powers[l].normal(self.__paddle, self.__ball)
+                self.__powers[l].setTime(-1)
 
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])
+        self.__lifeRec = True
         self.__paddle.setStick(True)
 
     def won(self):
@@ -272,11 +294,14 @@ class Game:
 
     def timeCheck(self, tempTime, pup):
         if(pup.getTime() != -1 and tempTime - pup.getTime() - period >= 1e-3):
-            if(pup.getType() == 3 or pup.getType() == 4 or pup.getType() == 5):
-                pup.normal(self.__ball, self.__ball2)
-                return
+            pup.setTime(-1)
+            ctype = pup.getType()
 
-            pup.normal(self.__paddle, self.__ball)
+            if(ctype == 1 or ctype == 2 or ctype == 3):
+                self.__paddle.release(self.__ball)
+
+            elif(not self.__lifeRec and ctype == 6):
+                self.__paddle.release(self.__ball)
 
     def play(self):
 
@@ -284,6 +309,8 @@ class Game:
         ctr = 0
 
         while True:
+
+            self.activation()
 
             if self.__input.kbhit():
                 inp = self.__input.getch()
@@ -354,3 +381,5 @@ class Game:
             ctr += 1
             if(ctr == 11):
                 ctr = 1
+
+            self.reset()
