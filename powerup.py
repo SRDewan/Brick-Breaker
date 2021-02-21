@@ -13,7 +13,7 @@ class Powerup(Object):
         self.__type = type
         self.__time = -1
         super().__init__(shape, [font['blue'], bg['black']], pos)
-        self.setFrame(3)
+        self.setFrame(10)
 
     def getType(self):
         return self.__type

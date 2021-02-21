@@ -352,5 +352,5 @@ class Game:
 
             time.sleep(1 / fps)
             ctr += 1
-            if(ctr == 7):
+            if(ctr == 11):
                 ctr = 1
