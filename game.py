@@ -51,22 +51,22 @@ class Game:
                 # placing powerups 
                 if(self.__brickCtr - 1 - j == i):
                     if(i == 0):
-                        self.__powers.append(padExpand("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
+                        self.__powers.append(padExpand([2 + i, 2 + 3 * j]))
 
                     elif(i == 1):
-                        self.__powers.append(padShrink("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
+                        self.__powers.append(padShrink([2 + i, 2 + 3 * j]))
 
                     elif(i == 2):
-                        self.__powers.append(ballMul("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
+                        self.__powers.append(ballMul([2 + i, 2 + 3 * j]))
 
                     elif(i == 3):
-                        self.__powers.append(ballFast("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
+                        self.__powers.append(ballFast([2 + i, 2 + 3 * j]))
 
                     elif(i == 4):
-                        self.__powers.append(ballThru("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
+                        self.__powers.append(ballThru([2 + i, 2 + 3 * j]))
                         
                     elif(i == 5):
-                        self.__powers.append(padGrab("%d%d%d"%(i, i, i), [2 + i, 2 + 3 * j]))
+                        self.__powers.append(padGrab([2 + i, 2 + 3 * j]))
 
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__ball = Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])

@@ -38,7 +38,7 @@ class Powerup(Object):
 
 class padExpand(Powerup):
     
-    def __init__(self, shape, pos):
+    def __init__(self, pos):
         super().__init__("<=>", pos, 1)
 
     def power(self, paddle, ball):
@@ -51,7 +51,7 @@ class padExpand(Powerup):
 
 class padShrink(Powerup):
     
-    def __init__(self, shape, pos):
+    def __init__(self, pos):
         super().__init__(">=<", pos, 2)
 
     def power(self, paddle, ball):
@@ -64,7 +64,7 @@ class padShrink(Powerup):
 
 class ballMul(Powerup):
     
-    def __init__(self, shape, pos):
+    def __init__(self, pos):
         super().__init__("2xO", pos, 3)
 
     def power(self, obj1, ball):
@@ -87,7 +87,7 @@ class ballMul(Powerup):
 
 class ballFast(Powerup):
     
-    def __init__(self, shape, pos):
+    def __init__(self, pos):
         super().__init__(">>>", pos, 4)
 
     def power(self, obj1, ball):
@@ -102,7 +102,7 @@ class ballFast(Powerup):
 
 class ballThru(Powerup):
     
-    def __init__(self, shape, pos):
+    def __init__(self, pos):
         super().__init__("XXX", pos, 5)
 
     def power(self, obj1, ball):
@@ -117,7 +117,7 @@ class ballThru(Powerup):
 
 class padGrab(Powerup):
     
-    def __init__(self, shape, pos):
+    def __init__(self, pos):
         super().__init__("|_|", pos, 6)
 
     def power(self, paddle, ball):
