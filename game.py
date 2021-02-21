@@ -173,6 +173,7 @@ class Game:
                         if(self.verticalCol(obj.getPos(), self.__paddle.getPos(), dim1, dim2)):
                             self.__paddle.collide(obj)
                             obj.collide([-1 * obj.getVel()[0], obj.getVel()[1]])
+                            return
 
                 elif(flags[0] == 2):
 
