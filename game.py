@@ -92,6 +92,10 @@ class Game:
             if(self.findPup(6).getTime() == -1):
                 self.__paddle.setStick(False)
 
+        elif(txt == 'q'):
+            print("\033[?25h")
+            quit()
+
     def verticalCol(self, pos1, pos2, dim1, dim2): 
         if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
             return False 
@@ -269,6 +273,7 @@ class Game:
         if(not self.__lives):
             self.__score -= (time.time() - self.__start) / 10
             print(font['red'] + bg['reset'] + "You Lost! Game Over! Your final score is %.3f" %(self.__score))
+            print("\033[?25h")
             quit()
 
         for l in range(0, 6):
@@ -283,6 +288,7 @@ class Game:
     def won(self):
         self.__score -= (time.time() - self.__start) / 10
         print(font['red'] + bg['reset'] + "Congratulations! You Won! Your final score is %.3f" %(self.__score))
+        print("\033[?25h")
         quit()
 
     def timeCheck(self, tempTime, pup):
@@ -303,6 +309,7 @@ class Game:
     def play(self):
 
         os.system('cls' if os.name == 'nt' else 'clear')
+        print("\033[?25l")
         ctr = 0
 
         while True:
