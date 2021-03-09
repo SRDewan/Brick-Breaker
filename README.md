@@ -7,7 +7,7 @@ The classic brick breaker game in terminal from scratch without any special libr
 pip3 install -r requirements.txt
 
 2. <b>Execution</b><br />
-python3 main.p
+python3 main.py
 
 ## Controls
 
