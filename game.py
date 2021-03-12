@@ -26,6 +26,7 @@ class Game:
         self.__powers = []
         self.__explode = []
         self.__lifeRec = True
+        self.__moveBr = 0
 
         self.__lives = lives
         self.__score = score
@@ -46,6 +47,9 @@ class Game:
                 elif(self.__brickCtr - 2 - j == i):
                     self.__bricks[i].append(Brick(2, [2 + i, 2 + 3 * j]))
                 # placing exploding bricks
+
+                elif(j == self.__brickCtr / 2):
+                    self.__bricks[i].append(Brick(0, [2 + i, 2 + 3 * j], True))
 
                 else:
                     self.__bricks[i].append(Brick(0, [2 + i, 2 + 3 * j]))
@@ -183,6 +187,9 @@ class Game:
                         if(self.verticalCol(obj.getPos(), self.__paddle.getPos(), dim1, dim2)):
                             self.__paddle.collide(obj)
                             obj.collide([-1 * obj.getVel()[0], obj.getVel()[1]])
+                            if(time.time() - self.__start >= timeLim):
+                                self.__moveBr += 1
+
                             return
 
                 elif(flags[0] == 2):
@@ -271,6 +278,26 @@ class Game:
                 self.__ballCtr *= 2
                 temp[i].power(self.__paddle, self.__balls)
 
+    def moveBricks(self):
+        for i in range(len(self.__bricks) - 1, -1, -1):
+            for j in range(0, len(self.__bricks[i])):
+                if(self.__bricks[i][j].getActive()):
+                    for k in range(0, len(self.__powers)):
+                        if(self.__powers[k].getPos() == self.__bricks[i][j].getPos() and self.__powers[k].getVel() == [0, 0]):
+                            self.__powers[k].setVel([self.__moveBr, 0])
+                            self.__powers[k].move()
+                            self.__powers[k].setVel([0, 0])
+                            break
+
+                    self.__bricks[i][j].setVel([self.__moveBr, 0])
+                    self.__bricks[i][j].move()
+
+                    if(self.__bricks[i][j].getPos()[0] == self.__paddle.getPos()[0]):
+                        self.__lives = 1
+                        self.lifeLoss()
+
+        self.__moveBr = 0
+
     def lifeLoss(self):
 
         self.__lives -= 1
@@ -337,6 +364,11 @@ class Game:
 
                 self.__input.flush()
 
+            for i in range(0, len(self.__bricks)):
+                for j in range(0, len(self.__bricks[i])):
+                    if(ctr % brickFps == 0):
+                        self.__bricks[i][j].rainbow()
+
             if(len(self.__explode)):
                 self.explosion()
 
@@ -344,6 +376,9 @@ class Game:
 
             for ball in self.__balls:
                 self.collision(ball, [1, 1])
+
+            if(self.__moveBr):
+                self.moveBricks()
 
             tempTime = time.time()
             for l in range(0, 6):

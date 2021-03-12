@@ -41,7 +41,9 @@ padLen = 5
 change = 2
 
 fps = 150
+timeLim = 100
 ballFps = 5
+brickFps = 5
 powFps = 10
 jump = 1
 
