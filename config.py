@@ -39,12 +39,14 @@ brickCol = [["black", "red", "yellow", "green"],
 
 padLen = 5
 change = 2
+gravity = 1
 
 fps = 150
 timeLim = 100
 ballFps = 5
 brickFps = 5
 powFps = 10
+gravFps = 20
 jump = 1
 
 points = 5

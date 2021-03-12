@@ -140,9 +140,10 @@ class Game:
             self.__explode[z].collide(True)
             self.__score += points
 
-            for k in range(0, 6):
-                if(self.__powers[k].getPos() == self.__explode[z].getPos()):
-                    self.__powers[k].fall()
+            for k in range(0, len(self.__powers)):
+                if(self.__powers[k].getPos() == self.__explode[z].getPos() and not self.__powers[k].getActive()):
+                    self.__powers[k].activate(self.__powers[k].getPos())
+                    self.__powers[k].setVel([-2, 0])
 
         for z in range(0, length):
             del self.__explode[0]
@@ -219,9 +220,10 @@ class Game:
                                 if(not self.__bricks[i][j].getActive()):
                                     self.__score += points
 
-                                    for k in range(0, 6):
-                                        if(self.__powers[k].getPos() == self.__bricks[i][j].getPos()):
-                                            self.__powers[k].fall()
+                                    for k in range(0, len(self.__powers)):
+                                        if(self.__powers[k].getPos() == self.__bricks[i][j].getPos() and not self.__powers[k].getActive()):
+                                            self.__powers[k].activate(self.__powers[k].getPos())
+                                            self.__powers[k].setVel(obj.getVel())
 
                                 if(thru):
                                     continue
@@ -283,7 +285,7 @@ class Game:
             for j in range(0, len(self.__bricks[i])):
                 if(self.__bricks[i][j].getActive()):
                     for k in range(0, len(self.__powers)):
-                        if(self.__powers[k].getPos() == self.__bricks[i][j].getPos() and self.__powers[k].getVel() == [0, 0]):
+                        if(self.__powers[k].getPos() == self.__bricks[i][j].getPos() and not self.__powers[k].getActive()):
                             self.__powers[k].setVel([self.__moveBr, 0])
                             self.__powers[k].move()
                             self.__powers[k].setVel([0, 0])
@@ -308,7 +310,7 @@ class Game:
             print("\033[?25h")
             quit()
 
-        for l in range(0, 6):
+        for l in range(0, len(self.__powers)):
             if(self.__powers[l].getTime() != -1):
 
                 self.__powers[l].setTime(-1)
@@ -369,6 +371,12 @@ class Game:
                     if(ctr % brickFps == 0):
                         self.__bricks[i][j].rainbow()
 
+            for l in range(0, len(self.__powers)):
+                    oldVel = self.__powers[l].getVel()[:]
+
+                    if(self.__powers[l].getActive() and ctr % gravFps == 0):
+                        self.__powers[l].setVel([oldVel[0] + gravity, oldVel[1]])
+
             if(len(self.__explode)):
                 self.explosion()
 
@@ -381,7 +389,7 @@ class Game:
                 self.moveBricks()
 
             tempTime = time.time()
-            for l in range(0, 6):
+            for l in range(0, len(self.__powers)):
                 self.timeCheck(tempTime, self.__powers[l])
 
                 if(ctr % self.__powers[l].getFrame() == 0):
@@ -422,12 +430,12 @@ class Game:
             print(font['white'] + bg['reset'] + "Level: ", self.__lvl)
             print(font['white'] + bg['reset'] + "Time: %.2f" %(time.time() - self.__start))
 
-            for i in range(0, 6):
-                    self.__screen.populate(self.__powers[i])
-
-            for i in range(0, 6):
-                for j in range(0, self.__brickCtr):
+            for i in range(0, len(self.__bricks)):
+                for j in range(0, len(self.__bricks[i])):
                     self.__screen.populate(self.__bricks[i][j])
+
+            for i in range(0, len(self.__powers)):
+                self.__screen.populate(self.__powers[i])
 
             self.__screen.populate(self.__paddle)
 
@@ -438,7 +446,7 @@ class Game:
 
             time.sleep(1 / fps)
             ctr += 1
-            if(ctr == 11):
+            if(ctr == gravFps + 1):
                 ctr = 1
 
             self.reset()

@@ -13,7 +13,7 @@ class Powerup(Object):
         shape = listify(shape)
         self.__type = type
         self.__time = -1
-        super().__init__(shape, [font['blue'], bg['black']], pos)
+        super().__init__(shape, [font['blue'], bg['black']], pos, False)
         self.setFrame(powFps)
 
     def getType(self):
@@ -30,6 +30,9 @@ class Powerup(Object):
 
     def collide(self):
         self.destroy()
+        self.setVel([1, 0])
+        self.move()
+        self.setVel([0, 0])
 
     def getTime(self):
         return self.__time
