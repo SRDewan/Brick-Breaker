@@ -121,3 +121,12 @@ class padShoot(Powerup):
         paddle.setShape(listify(strg))
 
         paddle.setShoot(True)
+
+class ballFire(Powerup):
+    
+    def __init__(self, pos):
+        super().__init__("<O>", pos, 8)
+
+    def power(self, paddle, balls):
+        for ball in balls:
+            ball.setFire(True)

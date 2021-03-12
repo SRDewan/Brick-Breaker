@@ -33,9 +33,9 @@ class Brick(Object):
     def getType(self):
         return self.__type
 
-    def collide(self, thru=False):
-        if(not self.__type and not thru):
+    def collide(self, thru=False, fire=False):
+        if(not self.__type and not thru and not fire):
             self.hit(self.__status - 1)
 
-        elif(self.__type == 2 or thru):
+        elif(self.__type == 2 or thru or fire):
             self.hit(0)

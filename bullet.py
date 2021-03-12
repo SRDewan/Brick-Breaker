@@ -9,6 +9,3 @@ class Bullet(Object):
         shape = listify("|")
         super().__init__(shape, [font['black'], bg['black']], pos, True, [-1, 0])
         self.setFrame(bullFps)
-
-    def getThru(self):
-        return False

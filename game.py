@@ -73,7 +73,7 @@ class Game:
                         self.__powers.append(ballFast([2 + i, 2 + 3 * j]))
 
                     elif(i == 4):
-                        self.__powers.append(padShoot([2 + i, 2 + 3 * j]))
+                        self.__powers.append(ballFire([2 + i, 2 + 3 * j]))
                         
                     elif(i == 5):
                         self.__powers.append(padGrab([2 + i, 2 + 3 * j]))
@@ -122,11 +122,11 @@ class Game:
                         return None
                     return self.__bricks[m][n]
 
-    def findBricks(self, brick):
+    def findBricks(self, brick, fire=False):
         posit = brick.getPos()
         dim = brick.getDim()
 
-        if(brick.getType() == 2):
+        if(brick.getType() == 2 or fire):
             for a in range(posit[0] - 1 * dim[0], posit[0] + 2 * dim[0], dim[0]):
                 for b in range(posit[1] - 1 * dim[1], posit[1] + 2 * dim[1], dim[1]):
                     if(a == posit[0] and b == posit[1]):
@@ -217,9 +217,15 @@ class Game:
 
                             if(self.colChck(pos1, dim1, pos2, dim2)):
 
-                                thru = obj.getThru()
-                                self.findBricks(self.__bricks[i][j])
-                                self.__bricks[i][j].collide(thru)
+                                thru = False
+                                fire = False
+
+                                if(flags[1] == 1):
+                                    thru = obj.getThru()
+                                    fire = obj.getFire()
+
+                                self.findBricks(self.__bricks[i][j], fire)
+                                self.__bricks[i][j].collide(thru, fire)
                                 if(not self.__bricks[i][j].getActive()):
                                     self.__score += points
 
@@ -228,7 +234,7 @@ class Game:
                                             self.__powers[k].activate(self.__powers[k].getPos())
                                             self.__powers[k].setVel(obj.getVel())
 
-                                if(thru):
+                                if(thru or fire):
                                     continue
 
                                 if(flags[1] == 2):
@@ -261,6 +267,7 @@ class Game:
         for b in range(0, len(self.__balls)):
             self.__balls[b].setFrame(ballFps)
             self.__balls[b].setThru(False)
+            self.__balls[b].setFire(False)
 
     def padPowCol(self):
         temp = []
@@ -357,8 +364,8 @@ class Game:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("\033[?25l")
         ctr = 0
-        self.findPup(1).setTime(time.time())
-        # self.findPup(6).setTime(time.time())
+        # self.findPup(3).setTime(time.time())
+        # self.findPup(8).setTime(time.time())
 
         while True:
 

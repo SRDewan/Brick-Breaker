@@ -10,6 +10,7 @@ class Ball(Object):
         super().__init__(shape, [font['black'], bg['black']], pos)
         self.setFrame(ballFps)
         self.__thru = False
+        self.__fire = False
         self.__oldyVel = 0
 
     def getThru(self):
@@ -17,6 +18,12 @@ class Ball(Object):
 
     def setThru(self, stat):
         self.__thru = stat 
+
+    def getFire(self):
+        return self.__fire
+
+    def setFire(self, stat):
+        self.__fire = stat 
 
     def getOldVel(self):
         return self.__oldyVel
