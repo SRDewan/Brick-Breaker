@@ -13,6 +13,7 @@ from brick import *
 from paddle import *
 from ball import *
 from powerup import *
+from bullet import *
 from input import *
 
 class Game:
@@ -25,6 +26,7 @@ class Game:
         self.__bricks = []
         self.__powers = []
         self.__explode = []
+        self.__bullets = []
         self.__lifeRec = True
         self.__moveBr = 0
 
@@ -56,6 +58,7 @@ class Game:
                 # placing normal bricks
         
                 # placing powerups 
+                #NOTE: Always append padShoot after padExpand and padShrink for shape purposes
                 if(self.__brickCtr - 1 - j == i):
                     if(i == 0):
                         self.__powers.append(padExpand([2 + i, 2 + 3 * j]))
@@ -70,7 +73,7 @@ class Game:
                         self.__powers.append(ballFast([2 + i, 2 + 3 * j]))
 
                     elif(i == 4):
-                        self.__powers.append(ballThru([2 + i, 2 + 3 * j]))
+                        self.__powers.append(padShoot([2 + i, 2 + 3 * j]))
                         
                     elif(i == 5):
                         self.__powers.append(padGrab([2 + i, 2 + 3 * j]))
@@ -228,7 +231,10 @@ class Game:
                                 if(thru):
                                     continue
 
-                                if(self.verticalCol(obj.getPos(), self.__bricks[i][j].getPos(), dim1, dim2)):
+                                if(flags[1] == 2):
+                                    return True
+
+                                elif(self.verticalCol(obj.getPos(), self.__bricks[i][j].getPos(), dim1, dim2)):
                                     obj.collide([-1 * obj.getVel()[0], obj.getVel()[1]])
                                     return
 
@@ -250,11 +256,11 @@ class Game:
         self.__paddle.setShape(listify(" " * padLen))
         if(not self.__lifeRec):
             self.__paddle.setStick(False)
+        self.__paddle.setShoot(False)
 
         for b in range(0, len(self.__balls)):
             self.__balls[b].setFrame(ballFps)
             self.__balls[b].setThru(False)
-
 
     def padPowCol(self):
         temp = []
@@ -351,7 +357,7 @@ class Game:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("\033[?25l")
         ctr = 0
-        # self.findPup(5).setTime(time.time())
+        self.findPup(1).setTime(time.time())
         # self.findPup(6).setTime(time.time())
 
         while True:
@@ -385,6 +391,14 @@ class Game:
             for ball in self.__balls:
                 self.collision(ball, [1, 1])
 
+            delarr = []
+            for bull in range(0, len(self.__bullets)):
+                if(self.collision(self.__bullets[bull], [1, 2])):
+                    delarr.append(bull)
+
+            for bull in range(0, len(delarr)):
+                del self.__bullets[delarr[bull] - bull]
+
             if(self.__moveBr):
                 self.moveBricks()
 
@@ -401,6 +415,24 @@ class Game:
                     self.__balls[b].move(1)
                 if(not self.__balls[b].getActive()):
                     tmpDel.append(self.__balls[b])
+
+            delarr = []
+            for bull in range(0, len(self.__bullets)):
+                if(ctr % bullFps == 0):
+                    if(self.__bullets[bull].move(2)):
+                        delarr.append(bull)
+
+            for bull in range(0, len(delarr)):
+                del self.__bullets[delarr[bull] - bull]
+
+            if(self.__paddle.getShoot() and ctr % bullDelay == 0):
+                padPos = self.__paddle.getPos()
+                padDim = self.__paddle.getDim()
+
+                bul1 = Bullet([padPos[0] - 1, padPos[1]])
+                bul2 = Bullet([padPos[0] - 1, padPos[1] + padDim[1] - 1])
+                self.__bullets.append(bul1)
+                self.__bullets.append(bul2)
 
             for ball in tmpDel:
                 self.__balls.remove(ball)
@@ -429,6 +461,9 @@ class Game:
             print(font['white'] + bg['reset'] + "Score: ", self.__score)
             print(font['white'] + bg['reset'] + "Level: ", self.__lvl)
             print(font['white'] + bg['reset'] + "Time: %.2f" %(time.time() - self.__start))
+
+            for bull in range(0, len(self.__bullets)):
+                self.__screen.populate(self.__bullets[bull])
 
             for i in range(0, len(self.__bricks)):
                 for j in range(0, len(self.__bricks[i])):

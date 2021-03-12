@@ -111,3 +111,13 @@ class padGrab(Powerup):
     def power(self, paddle, balls):
         paddle.setStick(True)
 
+class padShoot(Powerup):
+    
+    def __init__(self, pos):
+        super().__init__("^_^", pos, 7)
+
+    def power(self, paddle, balls):
+        strg = "I" + " " * (paddle.getDim()[1] - 2) + "I"
+        paddle.setShape(listify(strg))
+
+        paddle.setShoot(True)

@@ -8,6 +8,7 @@ class Paddle(Object):
 
         shape = listify(" " * padLen)
         self.__stick = True  # True => ball sticks to paddle, False => ball reflects
+        self.__shoot = False
         super().__init__(shape, [font['black'], bg['white']], pos)
 
     def getStick(self):
@@ -15,6 +16,12 @@ class Paddle(Object):
 
     def setStick(self, stat):
         self.__stick = stat 
+
+    def getShoot(self):
+        return self.__shoot
+
+    def setShoot(self, stat):
+        self.__shoot = stat 
 
     def stickChck(self, ball):
         ballPos = ball.getPos()

@@ -75,7 +75,7 @@ class Object:
         return False
 
     def move(self, flag=0):
-        # flag = 0 --> nothing, flag = 1 --> reflect 
+        # flag = 0 --> nothing, flag = 1 --> reflect, flag = 2 --> destroy for ceil 
 
         if(not self.chckWall()):
             self.__pos[1] = self.__pos[1] + self.__vel[1]
@@ -90,6 +90,9 @@ class Object:
         elif(flag == 1 and self.chckUp()):
             self.__vel[0] *= -1
             self.__pos[0] = self.__pos[0] + self.__vel[0]
+
+        elif(flag == 2 and self.chckUp()):
+            return True
 
         elif(self.chckDown()):
             self.destroy()

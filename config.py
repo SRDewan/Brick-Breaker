@@ -46,6 +46,8 @@ timeLim = 100
 ballFps = 5
 brickFps = 5
 powFps = 10
+bullFps = 5
+bullDelay = 20
 gravFps = 20
 jump = 1
 
