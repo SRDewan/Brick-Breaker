@@ -2,8 +2,10 @@ import os
 import colorama as col 
 
 rows, cols= os.popen('stty size', 'r').read().split()
-rows = int(rows) - 5
+rows = int(rows) - 10
 cols = int(cols) - 10
+
+lvlnum = 3
 
 font = {
         "red": col.Fore.RED,

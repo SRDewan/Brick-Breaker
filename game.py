@@ -17,17 +17,19 @@ from input import *
 
 class Game:
 
-    def __init__(self):
+    def __init__(self, lives, score, lvl):
         self.__input = KBHit()
         self.__screen = Screen()
-        self.__lives = 3
-        self.__score = 0
         self.__start = time.time()
         self.__brickCtr = (int)((cols - 4) / 3)
         self.__bricks = []
         self.__powers = []
         self.__explode = []
         self.__lifeRec = True
+
+        self.__lives = lives
+        self.__score = score
+        self.__lvl = lvl
         # np.empty((6, self.__brickCtr))
 
         for i in range(0, 6):
@@ -91,6 +93,9 @@ class Game:
             
             if(self.findPup(6).getTime() == -1):
                 self.__paddle.setStick(False)
+
+        if(txt == 'n' or txt == 'N'):
+            return True
 
         elif(txt == 'q'):
             print("\033[?25h")
@@ -287,9 +292,15 @@ class Game:
 
     def won(self):
         self.__score -= (time.time() - self.__start) / 10
-        print(font['red'] + bg['reset'] + "Congratulations! You Won! Your final score is %.3f" %(self.__score))
-        print("\033[?25h")
-        quit()
+        if(self.__lvl == 3):
+            print(font['red'] + bg['reset'] + "Congratulations! You Won! Your final score is %.3f" %(self.__score))
+            print("\033[?25h")
+            quit()
+
+        else:
+            print(font['red'] + bg['reset'] + "Congratulations! You cleared level %d! Your current score is %.3f" %(self.__lvl, self.__score))
+            time.sleep(3)
+            return True
 
     def timeCheck(self, tempTime, pup):
         if(pup.getTime() != -1 and tempTime - pup.getTime() - period >= 1e-3):
@@ -311,6 +322,8 @@ class Game:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("\033[?25l")
         ctr = 0
+        # self.findPup(5).setTime(time.time())
+        # self.findPup(6).setTime(time.time())
 
         while True:
 
@@ -318,7 +331,10 @@ class Game:
 
             if self.__input.kbhit():
                 inp = self.__input.getch()
-                self.handle_input(inp)
+                retd = self.handle_input(inp)
+                if(retd and self.won()):
+                    return [self.__lives, self.__score]
+
                 self.__input.flush()
 
             if(len(self.__explode)):
@@ -360,12 +376,15 @@ class Game:
                     break
 
             if(win):
-                self.won()
+                ret = self.won()
+                if(ret):
+                    return [self.__lives, self.__score]
 
             self.__screen.clear()
 
             print(font['white'] + bg['reset'] + "Lives: ", self.__lives)
             print(font['white'] + bg['reset'] + "Score: ", self.__score)
+            print(font['white'] + bg['reset'] + "Level: ", self.__lvl)
             print(font['white'] + bg['reset'] + "Time: %.2f" %(time.time() - self.__start))
 
             for i in range(0, 6):
