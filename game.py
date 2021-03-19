@@ -145,9 +145,9 @@ class Game:
             print("\033[?25h")
             quit()
 
-    def verticalCol(self, pos1, pos2, dim1, dim2): 
+    def verticalCol(self, pos1, pos2, dim1, dim2, fix=False): 
         if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
-            if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
+            if(fix and set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
                 return True 
             else:
                 return False
@@ -286,7 +286,7 @@ class Game:
                                 if(flags[1] == 2):
                                     return True
 
-                                elif(self.verticalCol(obj.getPos(), self.__bricks[i][j].getPos(), dim1, dim2)):
+                                elif(self.verticalCol(obj.getPos(), self.__bricks[i][j].getPos(), dim1, dim2, self.__bricks[i][j].getType() == 3)):
                                     obj.collide([-1 * obj.getVel()[0], obj.getVel()[1]])
                                     return
 
