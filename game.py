@@ -274,6 +274,9 @@ class Game:
 
                                 if(not self.__bricks[i][j].getActive()):
                                     self.__score += points
+                                    if(self.__bricks[i][j].getType() == 3):
+                                        self.__score += 100 * points
+
 
                                     for k in range(0, len(self.__powers)):
                                         if(self.__powers[k].getPos() == self.__bricks[i][j].getPos() and not self.__powers[k].getActive()):

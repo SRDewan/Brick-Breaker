@@ -42,7 +42,7 @@ change = 2
 gravity = 1
 
 fps = 100
-timeLim = 100
+timeLim = 150
 ballFps = 10
 brickFps = 5
 powFps = 10
