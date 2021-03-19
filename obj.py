@@ -96,6 +96,7 @@ class Object:
 
         elif(self.chckDown()):
             self.destroy()
+            return True
 
     def collide(self, newVel):                                            
         self.setVel(newVel)

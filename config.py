@@ -41,15 +41,19 @@ padLen = 5
 change = 2
 gravity = 1
 
-fps = 150
+fps = 100
 timeLim = 100
 ballFps = 5
 brickFps = 5
 powFps = 10
 bullFps = 5
 bullDelay = 20
+bombFps = 10
+bombDelay = 100
 gravFps = 20
 jump = 1
 
 points = 5
 period = 15
+spawn1 = 45
+spawn2 = 40

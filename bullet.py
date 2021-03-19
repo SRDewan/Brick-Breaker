@@ -4,8 +4,8 @@ from util import *
 
 class Bullet(Object):
 
-    def __init__(self, pos):
+    def __init__(self, shap, pos, vel):
 
-        shape = listify("|")
-        super().__init__(shape, [font['black'], bg['black']], pos, True, [-1, 0])
+        shape = listify(shap)
+        super().__init__(shape, [font['black'], bg['red']], pos, True, vel)
         self.setFrame(bullFps)

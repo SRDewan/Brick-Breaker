@@ -7,11 +7,19 @@ class Brick(Object):
     def __init__(self, type, pos, change=False):
 
         shape = listify("[ ]")
-        self.__type = type  ## 0 => Normal, 1 => Unbreakable, 2 => Exploding
+        self.__type = type  ## 0 => Normal, 1 => Unbreakable, 2 => Exploding, 3 => UFO
         self.__status = 3   ## Decreasing life/strength of brick from 3(max) to 0(disappear)
         self.__change = change 
 
-        super().__init__(shape, [font['black'], bg[brickCol[self.__type][self.__status]]], pos)
+        if(type == 3):
+            shape = listify("   .---.   \n _/__~0_\_ \n(_________)")
+            self.__status = 50   ## Decreasing life/strength of brick from 100(max) to 0(disappear)
+            brCol = [font['green'], bg['black']]
+
+        else:
+            brCol = [font['black'], bg[brickCol[self.__type][self.__status]]]
+
+        super().__init__(shape, brCol, pos)
 
     def rainbow(self):
         if(self.__change):
@@ -25,7 +33,9 @@ class Brick(Object):
     def hit(self, newStat):
         self.__status = newStat
         self.__change = False
-        self.setColor([self.getColor()[0], bg[brickCol[self.__type][self.__status]]])
+
+        if(self.__type != 3):
+            self.setColor([self.getColor()[0], bg[brickCol[self.__type][self.__status]]])
 
         if(not self.__status):
             self.destroy()
@@ -33,8 +43,11 @@ class Brick(Object):
     def getType(self):
         return self.__type
 
+    def getLife(self):
+        return self.__status
+
     def collide(self, thru=False, fire=False):
-        if(not self.__type and not thru and not fire):
+        if((not self.__type or self.__type == 3) and not thru and not fire):
             self.hit(self.__status - 1)
 
         elif(self.__type == 2 or thru or fire):

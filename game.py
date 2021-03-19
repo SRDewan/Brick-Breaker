@@ -27,8 +27,10 @@ class Game:
         self.__powers = []
         self.__explode = []
         self.__bullets = []
+        self.__bombs = []
         self.__lifeRec = True
         self.__moveBr = 0
+        self.__spawn = False
 
         self.__lives = lives
         self.__score = score
@@ -36,6 +38,9 @@ class Game:
         # np.empty((6, self.__brickCtr))
 
         for i in range(0, 6):
+            if(self.__lvl == lvlnum):
+                break
+
             self.__bricks.append([])
             for j in range(0, self.__brickCtr):
                 if(i == j):
@@ -73,14 +78,30 @@ class Game:
                         self.__powers.append(ballFast([2 + i, 2 + 3 * j]))
 
                     elif(i == 4):
-                        self.__powers.append(ballFire([2 + i, 2 + 3 * j]))
+                        self.__powers.append(padShoot([2 + i, 2 + 3 * j]))
                         
                     elif(i == 5):
                         self.__powers.append(padGrab([2 + i, 2 + 3 * j]))
 
+        if(self.__lvl == lvlnum):
+            self.__bricks.append([])
+            self.__bricks[0].append(Brick(3, [2, 2]))
+
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__balls = [Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])]
         self.__ballCtr = 1
+
+    def spawnBricks(self, ufo):
+        for i in range(1, 3 + 1):
+            if(len(self.__bricks) > i):
+                self.__bricks[i] = []
+
+            else:
+                self.__bricks.append([])
+
+            for j in range(0, cols - 1, 3):
+                self.__bricks[i].append(Brick(0, [ufo.getPos()[0] + ufo.getDim()[0] + i, j]))
+                # placing normal bricks
 
     def findPup(self, type):
         for x in self.__powers:
@@ -98,7 +119,8 @@ class Game:
             self.__paddle.release(self.__balls)
             self.__lifeRec = False
             
-            if(self.findPup(6).getTime() == -1):
+            retPow = self.findPup(6)
+            if(retPow and retPow.getTime() == -1):
                 self.__paddle.setStick(False)
 
         if(txt == 'n' or txt == 'N'):
@@ -226,6 +248,12 @@ class Game:
 
                                 self.findBricks(self.__bricks[i][j], fire)
                                 self.__bricks[i][j].collide(thru, fire)
+                                btype = self.__bricks[i][j].getType()
+                                blife = self.__bricks[i][j].getLife()
+
+                                if(btype == 3 and (blife == spawn1 or blife == spawn2)):
+                                    self.__spawn = True
+
                                 if(not self.__bricks[i][j].getActive()):
                                     self.__score += points
 
@@ -307,7 +335,7 @@ class Game:
                     self.__bricks[i][j].setVel([self.__moveBr, 0])
                     self.__bricks[i][j].move()
 
-                    if(self.__bricks[i][j].getPos()[0] == self.__paddle.getPos()[0]):
+                    if(self.__bricks[i][j].getPos()[0] + self.__bricks[i][j].getDim()[0] - 1 >= self.__paddle.getPos()[0]):
                         self.__lives = 1
                         self.lifeLoss()
 
@@ -328,6 +356,7 @@ class Game:
 
                 self.__powers[l].setTime(-1)
 
+        self.__balls = []
         self.__balls.append(Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)]))
         self.__lifeRec = True
         self.__paddle.setStick(True)
@@ -406,6 +435,19 @@ class Game:
             for bull in range(0, len(delarr)):
                 del self.__bullets[delarr[bull] - bull]
 
+            delarr = []
+            loseFlag = False
+            for bomb in range(0, len(self.__bombs)):
+                if(self.collision(self.__bombs[bomb], [2, 0])):
+                    loseFlag = True
+                    delarr.append(bomb)
+
+            for bomb in range(0, len(delarr)):
+                del self.__bombs[delarr[bomb] - bomb]
+
+            if(loseFlag):
+                self.lifeLoss()
+
             if(self.__moveBr):
                 self.moveBricks()
 
@@ -417,11 +459,21 @@ class Game:
                     self.__powers[l].move()
 
             tmpDel = []
+            below = True
+            ufo = self.__bricks[0][0]
             for b in range(0, len(self.__balls)):
                 if(ctr % self.__balls[b].getFrame() == 0):
                     self.__balls[b].move(1)
+
+                if(self.__balls[b].getPos()[0] <= ufo.getPos()[0] + ufo.getDim()[0] + 2 + 3):
+                    below = False
+
                 if(not self.__balls[b].getActive()):
                     tmpDel.append(self.__balls[b])
+
+            if(self.__spawn and below):
+                self.spawnBricks(ufo)
+                self.__spawn = False
 
             delarr = []
             for bull in range(0, len(self.__bullets)):
@@ -432,14 +484,30 @@ class Game:
             for bull in range(0, len(delarr)):
                 del self.__bullets[delarr[bull] - bull]
 
+            delarr = []
+            for bomb in range(0, len(self.__bombs)):
+                if(ctr % bombFps == 0):
+                    if(self.__bombs[bomb].move(2)):
+                        delarr.append(bomb)
+
+            for bomb in range(0, len(delarr)):
+                del self.__bombs[delarr[bomb] - bomb]
+
             if(self.__paddle.getShoot() and ctr % bullDelay == 0):
                 padPos = self.__paddle.getPos()
                 padDim = self.__paddle.getDim()
 
-                bul1 = Bullet([padPos[0] - 1, padPos[1]])
-                bul2 = Bullet([padPos[0] - 1, padPos[1] + padDim[1] - 1])
+                bul1 = Bullet("|", [padPos[0] - 1, padPos[1]], [-1, 0])
+                bul2 = Bullet("|", [padPos[0] - 1, padPos[1] + padDim[1] - 1], [-1, 0])
                 self.__bullets.append(bul1)
                 self.__bullets.append(bul2)
+
+            if(self.__lvl == lvlnum and ctr % bombDelay == 0):
+                ufoPos = self.__bricks[0][0].getPos()
+                ufoDim = self.__bricks[0][0].getDim()
+
+                bom = Bullet("o", [ufoPos[0] + ufoDim[0], ufoPos[1] + (int)(ufoDim[1] / 2)], [1, 0])
+                self.__bombs.append(bom)
 
             for ball in tmpDel:
                 self.__balls.remove(ball)
@@ -469,12 +537,18 @@ class Game:
             print(font['white'] + bg['reset'] + "Level: ", self.__lvl)
             print(font['white'] + bg['reset'] + "Time: %.2f" %(time.time() - self.__start))
 
+            if(self.__lvl == lvlnum):
+                print(font['white'] + bg['reset'] + "Boss Life(Max 100): ", self.__bricks[0][0].getLife())
+
             for bull in range(0, len(self.__bullets)):
                 self.__screen.populate(self.__bullets[bull])
 
             for i in range(0, len(self.__bricks)):
                 for j in range(0, len(self.__bricks[i])):
                     self.__screen.populate(self.__bricks[i][j])
+
+            for bomb in range(0, len(self.__bombs)):
+                self.__screen.populate(self.__bombs[bomb])
 
             for i in range(0, len(self.__powers)):
                 self.__screen.populate(self.__powers[i])
@@ -488,7 +562,7 @@ class Game:
 
             time.sleep(1 / fps)
             ctr += 1
-            if(ctr == gravFps + 1):
+            if(ctr == 101):
                 ctr = 1
 
             self.reset()
