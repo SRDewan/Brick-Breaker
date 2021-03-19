@@ -334,6 +334,7 @@ class Game:
 
                     self.__bricks[i][j].setVel([self.__moveBr, 0])
                     self.__bricks[i][j].move()
+                    self.__bricks[i][j].setVel([0, 0])
 
                     if(self.__bricks[i][j].getPos()[0] + self.__bricks[i][j].getDim()[0] - 1 >= self.__paddle.getPos()[0]):
                         self.__lives = 1
