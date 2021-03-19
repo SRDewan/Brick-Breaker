@@ -118,6 +118,7 @@ class padShoot(Powerup):
 
     def power(self, paddle, balls):
         strg = "I" + " " * (paddle.getDim()[1] - 2) + "I"
+        paddle.setColor([font['blue'], bg['purple']])
         paddle.setShape(listify(strg))
 
         paddle.setShoot(True)

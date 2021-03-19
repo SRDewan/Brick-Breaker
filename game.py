@@ -5,6 +5,7 @@ import tty
 import signal
 import os 
 import time
+import random
 import numpy as np
 
 from config import *
@@ -22,7 +23,8 @@ class Game:
         self.__input = KBHit()
         self.__screen = Screen()
         self.__start = time.time()
-        self.__brickCtr = (int)((cols - 4) / 3)
+        if(lvl != lvlnum):
+            self.__brickCtr = (int)((cols - 4) / (3 * (lvlnum - lvl)))
         self.__bricks = []
         self.__powers = []
         self.__explode = []
@@ -44,44 +46,39 @@ class Game:
             self.__bricks.append([])
             for j in range(0, self.__brickCtr):
                 if(i == j):
-                    self.__bricks[i].append(Brick(1, [2 + i, 2 + 3 * j]))
+                    self.__bricks[i].append(Brick(1, [2 + i, 2 + 3 * (lvlnum - lvl) * j]))
+                # placing unbreakable bricks
+
+                elif(self.__brickCtr - 1 - j == i):
+                    self.__bricks[i].append(Brick(1, [2 + i, 2 + 3 * (lvlnum - lvl) * j]))
                 # placing unbreakable bricks
 
                 elif(i == j - 1):
-                    self.__bricks[i].append(Brick(2, [2 + i, 2 + 3 * j]))
+                    self.__bricks[i].append(Brick(2, [2 + i, 2 + 3 * (lvlnum - lvl) * j]))
                 # placing exploding bricks
 
                 elif(self.__brickCtr - 2 - j == i):
-                    self.__bricks[i].append(Brick(2, [2 + i, 2 + 3 * j]))
+                    self.__bricks[i].append(Brick(2, [2 + i, 2 + 3 * (lvlnum - lvl) * j]))
                 # placing exploding bricks
 
-                elif(j == self.__brickCtr / 2):
-                    self.__bricks[i].append(Brick(0, [2 + i, 2 + 3 * j], True))
+                elif(j == (int)(self.__brickCtr / 2)):
+                    self.__bricks[i].append(Brick(0, [2 + i, 2 + 3 * (lvlnum - lvl) * j], True))
 
                 else:
-                    self.__bricks[i].append(Brick(0, [2 + i, 2 + 3 * j]))
+                    self.__bricks[i].append(Brick(0, [2 + i, 2 + 3 * (lvlnum - lvl) * j]))
                 # placing normal bricks
         
                 # placing powerups 
                 #NOTE: Always append padShoot after padExpand and padShrink for shape purposes
-                if(self.__brickCtr - 1 - j == i):
-                    if(i == 0):
-                        self.__powers.append(padExpand([2 + i, 2 + 3 * j]))
-
-                    elif(i == 1):
-                        self.__powers.append(padShrink([2 + i, 2 + 3 * j]))
-
-                    elif(i == 2):
-                        self.__powers.append(ballMul([2 + i, 2 + 3 * j]))
-
-                    elif(i == 3):
-                        self.__powers.append(ballFast([2 + i, 2 + 3 * j]))
-
-                    elif(i == 4):
-                        self.__powers.append(padShoot([2 + i, 2 + 3 * j]))
-                        
-                    elif(i == 5):
-                        self.__powers.append(padGrab([2 + i, 2 + 3 * j]))
+        if(lvl != lvlnum):
+            self.__powers.append(padExpand(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
+            self.__powers.append(padShrink(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
+            self.__powers.append(ballMul(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
+            self.__powers.append(ballFast(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
+            self.__powers.append(ballThru(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
+            self.__powers.append(padGrab(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
+            self.__powers.append(padShoot(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
+            self.__powers.append(ballFire(self.__bricks[random.randint(0, 5)][random.randint(0, self.__brickCtr - 1)].getPos()))
 
         if(self.__lvl == lvlnum):
             self.__bricks.append([])
@@ -308,6 +305,7 @@ class Game:
                 self.__powers[i].power(self.__paddle, self.__balls)
 
     def reset(self):
+        self.__paddle.setColor([font['black'], bg['white']])
         self.__paddle.setShape(listify(" " * padLen))
         if(not self.__lifeRec):
             self.__paddle.setStick(False)
