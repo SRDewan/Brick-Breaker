@@ -12,7 +12,7 @@ class Brick(Object):
         self.__change = change 
 
         if(type == 3):
-            shape = listify("   .---.   \n _/__~0_\_ \n(_________)")
+            shape = listify("   .-.   \n _/_0_\_ \n(_______)")
             self.__status = 50   ## Decreasing life/strength of brick from 100(max) to 0(disappear)
             brCol = [font['green'], bg['black']]
 

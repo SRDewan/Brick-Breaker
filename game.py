@@ -85,7 +85,7 @@ class Game:
 
         if(self.__lvl == lvlnum):
             self.__bricks.append([])
-            self.__bricks[0].append(Brick(3, [2, 2]))
+            self.__bricks[0].append(Brick(3, [1, (int)(cols / 2) - 4]))
 
         self.__paddle = Paddle([rows - 2, (int)(cols / 2) - 2])
         self.__balls = [Ball([self.__paddle.getPos()[0] - 1, self.__paddle.getPos()[1] + (int)(self.__paddle.getDim()[1] / 2)])]
