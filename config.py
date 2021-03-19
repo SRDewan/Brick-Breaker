@@ -43,14 +43,15 @@ gravity = 1
 
 fps = 100
 timeLim = 100
-ballFps = 5
+ballFps = 10
 brickFps = 5
 powFps = 10
 bullFps = 5
 bullDelay = 20
 bombFps = 10
-bombDelay = 100
+bombDelay = 300
 gravFps = 20
+bossFps = 10
 jump = 1
 
 points = 5

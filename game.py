@@ -100,13 +100,31 @@ class Game:
                 self.__bricks.append([])
 
             for j in range(0, cols - 1, 3):
-                self.__bricks[i].append(Brick(0, [ufo.getPos()[0] + ufo.getDim()[0] + i, j]))
+                self.__bricks[i].append(Brick(0, [ufo.getPos()[0] + ufo.getDim()[0] + i - 1, j]))
                 # placing normal bricks
 
     def findPup(self, type):
         for x in self.__powers:
             if(x.getType() == type):
                 return x
+
+    def bossMove(self):
+        ufo = self.__bricks[0][0]
+        pad = self.__paddle
+
+        if(ufo.getType() != 3):
+            return 
+
+        ufoMid = (int)(ufo.getPos()[1] + ufo.getDim()[1] / 2)
+        if(pad.getPos()[1] + pad.getDim()[1] - 1 < ufoMid):
+            ufo.setVel([0, -1])
+            ufo.move()
+            ufo.setVel([0, 0])
+
+        elif(pad.getPos()[1] > ufoMid):
+            ufo.setVel([0, 1])
+            ufo.move()
+            ufo.setVel([0, 0])
 
     def handle_input(self, txt):
         if(txt == 'a' or txt == 'A'):
@@ -132,7 +150,10 @@ class Game:
 
     def verticalCol(self, pos1, pos2, dim1, dim2): 
         if(set(range(pos1[0], pos1[0] + dim1[0])) & set(range(pos2[0], pos2[0] + dim2[0]))):
-            return False 
+            if(set(range(pos1[1], pos1[1] + dim1[1])) & set(range(pos2[1], pos2[1] + dim2[1]))):
+                return True 
+            else:
+                return False
 
         return True 
 
@@ -452,6 +473,9 @@ class Game:
             if(self.__moveBr):
                 self.moveBricks()
 
+            if(ctr % bossFps == 0):
+                self.bossMove()
+
             tempTime = time.time()
             for l in range(0, len(self.__powers)):
                 self.timeCheck(tempTime, self.__powers[l])
@@ -563,7 +587,7 @@ class Game:
 
             time.sleep(1 / fps)
             ctr += 1
-            if(ctr == 101):
+            if(ctr == 301):
                 ctr = 1
 
             self.reset()
