@@ -96,7 +96,7 @@ class Game:
             else:
                 self.__bricks.append([])
 
-            for j in range(0, cols - 1, 3):
+            for j in range(0, cols - 3, 3):
                 self.__bricks[i].append(Brick(0, [ufo.getPos()[0] + ufo.getDim()[0] + i - 1, j]))
                 # placing normal bricks
 
